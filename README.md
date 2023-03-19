@@ -1,5 +1,5 @@
-Incidence correction of covid-19 vaccine adverse events of special interest
-==========================================================================
+Covid-19 vaccine adverse events of special interest incidence correction
+========================================================================
 
 <img src="https://img.shields.io/badge/Study%20Status-Repo%20Created-lightgray.svg" alt="Study Status: Repo Created">
 

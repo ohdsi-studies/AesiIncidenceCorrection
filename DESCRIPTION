@@ -1,6 +1,6 @@
 Package: AesiIncidenceCorrection
 Type: Package
-Title: Incidence correction of covid-19 vaccine adverse events of special interest
+Title: Covid-19 vaccine adverse events of special interest incidence correction
 Version: 0.1.0
 Author: James Weaver [aut, cre]
 Maintainer: James Weaver <jweave17@its.jnj.com>
