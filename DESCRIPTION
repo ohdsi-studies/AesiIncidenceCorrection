@@ -1,0 +1,25 @@
+Package: AesiIncidenceCorrection
+Type: Package
+Title: Incidence correction of covid-19 vaccine adverse events of special interest
+Version: 0.1.0
+Author: James Weaver [aut, cre]
+Maintainer: James Weaver <jweave17@its.jnj.com>
+Description: This study uses 4 methods to correct the background incidence of covid-19 vaccine
+    adverse events of special interest for phenotype error across a distributed database network.
+    It assesses correction with 3 evaluation metrics.
+Depends:
+    R (>= 4.2.1),
+    DatabaseConnector (>= 4.2.2)
+Imports:
+    SqlRender (>= 1.6.3),
+    PheValuator (>= 2.1.10),
+    CohortIncidence (>=3.1.1).
+    ggplot2 (>= 3.4.1),
+    ParallelLogger (>= 3.1.0),
+    dplyr (>= 1.1.0),
+    readr (>= 2.1.4),
+    magrittr (>= 2.0.3)
+License: Apache License 2.0
+LazyData: TRUE
+RoxygenNote: 7.2.1
+Encoding: UTF-8
