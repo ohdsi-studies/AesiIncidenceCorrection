@@ -1,0 +1,330 @@
+---
+title: "| RESEARCH PROTOCOL\n| \n| Covid-19 vaccine adverse events of special interest incidence correction\n"
+fontsize: 10pt
+geometry: margin=1in
+output:
+  bookdown::word_document2:
+    toc: yes
+    reference_docx: ohdsi-protocol-style.docx
+  bookdown::html_document2:
+    df_print: paged
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+    number_sections: yes
+    number_tables: yes
+    css: "style.css"
+header-includes:
+- \usepackage[numbers,sort&compress]{natbib}
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+- \usepackage{threeparttablex}
+- \usepackage[normalem]{ulem}
+- \usepackage{makecell}
+- \usepackage{caption}
+- \usepackage{rotating}
+- \usepackage{multirow}
+- \usepackage{mwe,tikz}
+- \usepackage[percent]{overpic}
+- \usepackage{enumitem}
+- \usepackage{hyperref}
+- \usepackage{magrittr}
+- \newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+- \newcommand{\footerDate}{`r params$date`}
+- \input{header.tex}
+longtable: yes
+mainfont: Arial
+bibliography: Protocol.bib
+params:
+  date: 'Sys.Date()'
+  version: 1.0
+subtitle: 'Version: `r params$version`'
+link-citations: true
+csl: jamia.csl
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(kableExtra.latex.load_packages = FALSE)
+library(kableExtra)
+library(dplyr)
+options(knitr.kable.NA = "")
+if (!knitr::is_latex_output() && !knitr::is_html_output()) {
+  options(knitr.table.format = "simple")
+}
+
+latex_table_font_size <- 8
+source("https://raw.githubusercontent.com/ohdsi-studies/LegendT2dm/master/R/PrettyOutput.R")
+```
+
+# Investigators
+
+```{r parties, echo = FALSE, results = "asis", warning = FALSE}
+parties <- readr::read_delim(col_names = TRUE,
+                             show_col_types = FALSE,
+                             delim = ";",
+                             trim_ws = TRUE,
+                             file = "
+Investigator; Contact
+James Weaver ^1,2,3^;james.weaver@ndorms.ox.ac.uk
+Patrick B. Ryan ^2,3,4^;ryan@ohdsi.org
+Victoria Strauss ^1,2^;victoria.strauss@csm.ox.ac.uk
+Marc A. Suchard ^3,5^;msuchard@ucla.edu
+Joel Swerdel ^2,3^;jswerdel@its.jnj.com
+Daniel Prieto-Alhambra ^1,3,6^;daniel.prietoalhambra@ndorms.ox.ac.uk
+")
+
+tab <- kable(parties, booktabs = TRUE, linesep = "") %>%
+  column_spec(1, width = "20em") %>%
+footnote(general = "**^1^**Centre for Statistics in Medicine, Nuffield Department of Orthopedics, Rheumatology and Musculoskeletal Sciences, University of Oxford, Oxford, UK; **^2^**Observational Health Data Analytics, Janssen Research and Development, Titusville, NJ, USA; **^3^**Observational Health Data Sciences and Informatics, New York, NY, USA; **^4^**Department of Biomedical Informatics, Columbia University Medical Center, New York, NY, USA; **^5^**Department of Biostatistics, Fielding School of Public Health, and Department of Biomathematics, David Geffen School of Medicine, UCLA, Los Angeles, CA, USA; **^6^**Medical Informatics, Erasmus Medical Centre, Rotterdam, Netherlands", general_title = "")
+
+if (knitr::is_latex_output()) {
+  tab %>% kable_styling(latex_options = "striped", font_size = latex_table_font_size)
+} else {
+  tab %>% kable_styling(bootstrap_options = "striped")
+}
+```
+
+## Disclosures
+
+This study is undertaken within Observational Health Data Sciences and Informatics (OHDSI), an open science collaboration.
+**JW**, **PR**, and **JS** are employees of shareholders of Janssen R&D (a Johnson & Johnson company). **MAS** receives grant support from the US National Institutes of Health, US Food & Drug Administration and US Department of Veterans Affairs and contracts from Janssen R&D. **VS** has no conflicts of interest to declare. **DPA**’s research group has received grant support from Amgen, Chesi-Taylor, Novartis, and UCB Biopharma. His department has received advisory, consultancy fees from Amgen, Astellas, AstraZeneca, Johnson & Johnson, and UCB Biopharma and fees for speaker services from Amgen and UCB Biopharma. Janssen, on behalf of IMI-funded EHDEN and EMIF consortiums, and Synapse Management Partners have supported training programs organized by DPA's department and open for external participants organized by his department outside submitted work.
+
+# Rationale and background
+
+Substantial background incidence rate (IR) heterogeneity has been reported across age, sex, and databases for covid-19 vaccine adverse events of special interest (AESI)[@Lin1435]. It is unclear what proportion of the observed IR heterogeneity is attributable AESI phenotype error. This study intends to assess whether correcting AESI background IRs for phenotype error reduces heterogeneity.
+
+# Study objectives
+
+* Calculate the background IR and incidence proportion (IP) of each AESI by database, and within each database, stratified by age and by sex.
+* Calculate phenotype errors for 16 AESIs by database, and within each database, stratified by age and by sex.
+* Evaluate the impact of 4 methods of IR and IP correction for phenotype error.
+
+# Research methods
+
+## Data sources
+
+The study will be executed against 7 observational healthcare databases. These databases have been converted to the Observational Medical Outcomes Partnership (OMOP) Common Data Model (CDM)[@Hripcsak2015-cl; @10.1093/jamia/ocu023]
+
+- Optum® de-identified Clinformatics® Datamart - Socioeconomic status (optum_extended_ses)
+- Optum® Electronic Health Record (optum_ehr)
+- IBM MarketScan® Commercial Database (truven_ccae)
+- IBM MarketScan® Multi-State Medicaid (truven_mdcd)
+- IBM MarketScan® Medicare Supplemental Beneficiaries (truven_mdcr)
+- Clinical Practice Research Datalink Gold (cprd)
+- IQVIA® Disease Analyzer Germany (ims_germany)
+
+The database descriptions are in [Appendix Section A][Data sources].
+
+## Background incidence rates
+
+As per Li (2021)[@Lin1435], AESI IRs will be calculated as the number of outcomes divided by person-time at-risk per 100,000 person-years in the target population. Additionally, age and sex specific IRs will be calculated in each database. AESI IPs will be calculated as the number of persons with an outcome divided by persons at-risk per 100,000 persons in the target population (See [Incidence strata][Incidence strata]). Overall, yearly, age-specific, and sex-specific IRs will be pooled across databases using random-effects meta-analysis that estimates between-database variation using the DerSimonian-Laird method[@DerSimonian1986-co].
+
+Brief descriptions of the target and outcome cohorts are in this section. Detailed target and outcome cohort definitions, including concept sets and temporal logic descriptions are in [Appendix Section B][Target and outcome cohort definitions].
+
+### Target cohort
+
+The study period is from 2017-01-01 to 2019-12-31. The target at-risk population are persons observed on 2017-01-01, 2018-01-01, or 2019-01-01 with ≥365 days of prior continuous database observation.
+
+#### Persons observed on 1 Jan 2017-2019
+- Persons with any of the following cohort entry event criteria:
+  + Persons with an observation period on 2017-01-01 with ≥365 days of prior continuous database observation
+  + Persons with an observation period on 2018-01-01 with ≥365 days of prior continuous database observation
+  + Persons with an observation period on 2019-01-01 with ≥365 days of prior continuous database observation
+
+### Outcome cohorts
+
+The 16 outcomes in this study were previously assessed in a large distributed database network study[@Lin1435] and were selected based on a protocol published by the FDA Center for Biologics Evaluation and Research[@COVID19AESIs] and prioritized by the Brighton Collaboration[@BrightonAESIs]. The AESI assessed will be acute myocardial infarction, anaphylaxis, appendicitis, Bell's Palsy, deep vein thrombosis, disseminated intravascular coagulation, encephalomyelitis, Guillain Barre Syndrome, hemorrhagic stroke, immune thrombocytopenia, myocarditis or pericarditis, narcolepsy, non-hemorrhagic stroke, pulmonary embolism, thrombosis with thrombocytopenia, and transverse myelitis.
+
+Each AESI outcome cohort is defined as all event occurrences per person provided no events are observed within a fixed clean window before each event. This ensures that the time between subsequent events per person is at least as long as the clean window. The clean window length is defined as -365 to -1 days relative to the event date for all outcomes except for anaphylaxis (-30 to -1 days) and encephalomyelitis (-183 to -1 days). Encephalomyelitis, non-hemorrhagic and hemorrhagic stroke, and acute myocardial infarction events are required to occur in an inpatient setting in any diagnosis position. Guillain-Barre syndrome events are required to occur in an inpatient setting in the primary position.
+
+#### Time-at-risk
+
+TAR is defined as the target cohort start date (2017-01-01, 2018-01-01, or 2019-01-01) to target cohort start date + 365 days. The TAR definition aligns with that used in Li (2021)[@Lin1435]. Patients will be right-censored at event occurrence during a clean window or end of database observation. A patient can contribute ≥1 AESI event during the TAR if they meet the clean window criteria[@MOLL2023333]. Persons with prior outcome events will not contribute TAR until the clean window criteria is met.
+
+#### Incidence strata
+
+In addition to the database-level incidence, the incidence analysis will be conducted stratified by age group and by sex. The 8 age strata will include 1-5 years, 6-17 years, 18-34 years, 35-45 years, 55-64 years, 65-74 years, 75-84 years, and ≥85 years. Sex strata include male and female. Ideally, this would constitute $16_{outcomes}*7_{databases}*1_{database-level}*8_{age-strata}*2_{sex-strata}=1792$ sets of incidence results. Four outcomes (Encephalomyelitis, non-hemorrhagic and hemorrhagic stroke, and acute myocardial infarction) include an inpatient visit requirement so cannot be assessed in databases that do not include inpatient information Clinical Practice Research Datalink and IQVIA® Disease Analyzer Germany). This will remove $4_{outcomes}*2_{databases}*1_{database-level}*8_{age strata}*2_{sex-strata}=128$ sets of IR results from the ideal. Therefore, we will generate $1792-128=1664$ sets of incidence results.
+
+The following output will be reported for each incidence analysis:
+
+- Incidence rate per 100,000 person-years (IR)
+- Incidence proportion per 100,000 persons (IP)
+- Outcomes observed during TAR
+- Person-years at-risk
+- Persons at-risk
+- Outcomes observed during TAR before excluding pre-index outcomes
+- Person-years before excluding those with pre-index outcomes
+- Persons at-risk before excluding those with pre-index outcomes
+
+## Probabilistic reference standard validation
+
+PheValuator is a method to calculate the performance characteristics of phenotype algorithms, namely, sensitivity, specificity, and positive and negative predictive value[@Swerdel2019-fl; @Swerdel2022-pi]. It develops a diagnostic predictive model to determine a probabilistic reference standard of patients against which phenotype algorithm performance can be assessed. **Table 2** reports the PheValuator confusion matrix and error metric calculations. 
+
+### Table 2: PheValuator confusion matrix
+```{r phevalconfusionmatrix, echo = FALSE, results = "asis", warning = FALSE}
+phevalconfusionmatrix <- readr::read_delim(col_names = TRUE, # add check, x, and sigma symbols
+                                           show_col_types = FALSE,
+                                           delim = ";",
+                                           trim_ws = TRUE,
+                                           file = "
+Diagnostic model output;Phenotype algorithm case;Phenotype algorithm non-case
+Predicted probability from diagnostic predictive model, P(Y);TP = $\\Sigma$[P(Y | Case)];FP = $\\Sigma$[1 - P(Y | Case)]
+Predicted probability from diagnostic predictive model, P(Y);FN = $\\Sigma$[P(Y | Non-case)];TN = $\\Sigma$[1 - P(Y | Non-case)]
+")
+tab <- kable(phevalconfusionmatrix, booktabs = TRUE, linesep = "") %>%
+  #column_spec(1, width = "30em") %>%
+  footnote(general = "TP: true positive, FP: false positive, FN: false negative, TN: true negative, Sensitivity = TP / (TP + FN), Specificity = TN / (TN + FP), PPV = TP / (TP + FP), NPV = TN / (TN + FN)", general_title = "")
+if (knitr::is_latex_output()) {
+  tab %>% kable_styling(latex_options = "striped", font_size = latex_table_font_size)
+} else {
+  tab %>% kable_styling(bootstrap_options = "striped")
+}
+```
+
+The PheValuator validation study requires certain inputs. The extremely specific cohort (xSpec) narrowly identifies patients who are very likely a case. The diagnostic predictive model is fit to discriminate patients who are very likely a case from patients who are very unlikely to be a case. The prevalence cohort serves two purposes. It is used to remove probable cases from the database population, which provides the very unlikely cases to the diagnostics predictive model input data. Secondly, it is used as a crude measure of the phenotype prevalence in the database population for calibrating the diagnostic predictive model. The model will then be applied to the target population with noisy positive and noisy negative case labels [IS THIS ACCURATE??] where each patient will be assigned a case probability. 
+
+The target population evaluation cohort is defined as:
+
+- Persons observed on 2017-01-01, 2018-01-01, or 2019-01-01
+  + ≥1 occurrence of the outcome
+  + exactly 0 occurrences of the outcome
+  
+As per **Table 2**, the phenotype errors will be calculated for the full target population. The target population evaluation cohort where each patient has a case probability will then be stratified by year, by age group, and by sex in order to calculate the stratified phenotype errors. Given there are 8 age strata, 2 sex strata, and 4 outcomes are unavailable in 2 databases, this will constitute $1792-128=1664$ sets of error metrics.
+
+Detailed cohort definitions for probabilistic reference standard validation are available in
+[Appendix Section C][Probabilistic reference standard validation cohort definitions].
+
+## Incidence rate correction methods
+
+We will apply 4 methods to correct observed IRs and IPs for phenotype errors: a sensitivity (SN) and specificity (SP) approach, a positive predictive value (PPV) and negative predictive value (NPV) approach, a SN and PPV approach, and a false positive rate (FPR) approach.
+
+**Sensitivity and specificity approach** 
+
+$Outcomes_{Corrected} = (Outcomes - (1 - SP) * Persons_{At-risk}) / (SN - (1 - SP))$  
+
+**Positive and negative predictive values approach** 
+
+$Outcomes_{Corrected} = Outcomes * PPV + (Persons_{At-risk} - Outcomes) * (1 - NPV)$  
+
+**Sensitivity and positive predictive value approach** 
+
+$Outcomes_{Corrected} = Outcomes * PPV / SN$  
+
+**False positive rate approach**
+
+$FPR = Outcomes * (1 - SP) / PersonDays$  
+$Outcomes_{Corrected} = (Outcomes - (FPR * PersonDays)) / SN$
+  
+### Evaluation metrics
+
+- Phenotype error-error corrected incidence will be evaluated within databases by comparing it to the crude incidence using absolute incidence difference, relative incidence difference, and expected absolute measurement error.
+
+  + **Absolute IP difference:** $IP_{Corrected}-IP$
+  + **Relative IP difference:** $IP_{Corrected}/IP$
+  + **Expected absolute IP measurement error:** $abs(log(IP_{Corrected}/IP))$
+  + **Absolute IR difference:** $IR_{Corrected}-IR$
+  + **Relative IR difference:** $IR_{Corrected}/IR$
+  + **Expected absolute IR measurement error:** $abs(log(IR_{Corrected}/IR))$
+
+- Classify meta-analytic age-specific and sex-specific IRs by WHO Council for International Organizations of Medical Sciences thresholds[@WHO_CIOMS]: very common (≥10%), common (>1% to <10%), uncommon (≥0.1% to <1%), rare (≥0.01% to <0.1%), and very rare (<0.01%).
+
+# Strengths and limitations
+
+## Strengths
+
+- 1
+- 2
+- 3
+
+## Limitations
+
+- Diagnostic predictive model fit on entire target population, not on year, age group, or sex sub-populations. Model accuracy in full population may differ from that were it fit on sub-populations, which could result in error metric inaccuracy. 
+- Assumes probabilistic reference validation metrics are accurate.
+
+# Protection of human subjects
+This work does not involve human patient research. It uses de-identified patient-level data collected during routine healthcare provision. Confidentiality of patient records will be maintained. Study reports will contain aggregate data only and will not identify individual patients of care providers.
+
+# References {-}
+
+<div id="refs"></div>
+
+# (APPENDIX) Appendix {-}
+
+# Data sources
+
+```{r datasources, echo = FALSE, results = "asis", warning = FALSE}
+datasources <- readr::read_delim(col_names = TRUE,
+                                 show_col_types = FALSE,
+                                 delim = ";",
+                                 trim_ws = TRUE,
+                                 file = "
+Data source;Short name;Description
+Optum(c) de-identified Electronic Health Record Dataset;optum_ehr;Optum(c) de-identified Electronic Health Record Dataset is derived from dozens of healthcare provider organizations in the United States (that include more than 700 hospitals and 7,000 Clinics treating more than 103 million patients) receiving care in the United States. The medical record data includes clinical information, inclusive of prescriptions as prescribed and administered, lab results, vital signs, body measurements, diagnoses, procedures, and information derived from clinical Notes using Natural Language Processing (NLP).
+Optum(c) de-Identified Clinformatics® Data Mart Database – Date of Death;optum_dod;Optum(c) De-Identified Clinformatics(c) Data Mart Database is an adjudicated administrative health claims database for members with private health insurance, who are fully insured in commercial plans or Medicare Advantage. The population is primarily representative of US commercial claims patients (0-65 years old) with some Medicare (65+ years old) however ages are capped at 90 years. It includes data captured from administrative claims processed from inpatient and outpatient medical services and prescriptions as dispensed, as well as results for outpatient lab tests processed by large national lab vendors who participate in data exchange with Optum. Optum DOD also provides date of death (month and year only) for members with both medical and pharmacy coverage from the Social Security Death Master File (however after 2011 reporting frequency changed due to changes in reporting requirements) and location information for patients is at the US state level.
+IBM MarketScan Commercial Claims and Encounters Database;truven_ccae;IBM MarketScan Commercial Claims and Encounters Database (CCAE) is a US employer-based private-payer administrative claims database. The data include adjudicated health insurance claims (e.g., inpatient, outpatient, and outpatient pharmacy) as well as enrollment data from large employers and health plans who provide private healthcare coverage to employees, their spouses, and dependents. Additionally, it captures laboratory tests for a subset of the covered lives. This administrative claims database includes a variety of fee-for-service, preferred provider organizations, and capitated health plans.
+IBM MarketScan MultiState Medicaid Database;truven_mdcd;IBM MarketScan Multi-State Medicaid Database (MDCD) contains adjudicated US health insurance claims for Medicaid enrollees from multiple states and includes hospital discharge diagnoses, outpatient diagnoses and procedures, and outpatient pharmacy claims as well as ethnicity and Medicare eligibility. Members maintain their same identifier even if they leave the system for a brief period; however, the dataset lacks lab data.
+IBM MarketScan Medicare Supplemental and Coordination of Benefits Database;truven_mdcr;IBM MarketScan Medicare Supplemental and Coordination of Benefits Database (MDCR) represents health services of retirees in the United States with primary or Medicare supplemental coverage through privately insured fee-for-service, point-of-service, or capitated health plans. These data include adjudicated health insurance claims (e.g., inpatient, outpatient, and outpatient pharmacy). Additionally, it captures laboratory tests for a subset of the covered lives.
+The Clinical Practice Research Datalink (CPRD);cprd;The Clinical Practice Research Datalink (CPRD) is a governmental, not-for-profit research service, jointly funded by the NHS National Institute for Health Research (NIHR) and the Medicines and Healthcare products Regulatory Agency (MHRA), a part of the Department of Health, United Kingdom (UK). CPRD consists of data collected from UK primary care for all ages. This includes conditions, observations, measurements, and procedures that the general practitioner is made aware of in additional to any prescriptions as prescribed by the general practitioner. In addition to primary care, there are also linked secondary care records for a small number of people. The major data elements contained within this database are outpatient prescriptions given by the general practitioner (coded with Multilex codes) and outpatient clinical, referral, immunization or test events that the general practitioner knows about (coded in Read or ICD10 or LOINC codes). The database also contains the patients’ year of births and any date of deaths.
+IQVIA Disease Analyzer Germany;iqvia_germany_da;IQVIA(R) Disease Analyzer Germany is a longitudinal patient database providing anonymized information from continuing physician and patient interaction on consultations, diagnoses and treatment within Primary Care.  It contains a data from approximately 2,500 office based doctors in Germany. The contents of the database document the management of patients by General Practitioners as well as some specialists and include comprehensive records of diagnosis information; the management of the diagnosis, be it prescription issues, hospital admission or other tertiary care; specialist referrals; laboratory test results and administrative activities.  All the events are date stamped, with diagnosis/note/test information collected. Prescriptions, issued by GPs using either the generic substance or drug name are captured exactly as written, including information on indication, dose, strength and dosage instruction and cost. 
+")
+tab <- kable(datasources, booktabs = TRUE, linesep = "")
+if (knitr::is_latex_output()) {
+  tab %>% kable_styling(latex_options = "striped", font_size = latex_table_font_size)
+} else {
+  tab %>% kable_styling(bootstrap_options = "striped")
+}
+```
+
+# Target and outcome cohort definitions
+
+```{r outcome-cohorts, echo = FALSE, results = "asis", warning = FALSE, message = FALSE}
+cohortsToCreate <- readr::read_csv(system.file("settings", "CohortsToCreate.csv", package = "AesiIncidenceCorrection"))
+cohortsToCreate <- cohortsToCreate[1:17,]
+cohortsToCreate <- cohortsToCreate[order(cohortsToCreate$cohort_name), ]
+
+for (i in 1:nrow(cohortsToCreate)) { # i=1
+  cohortJsonFile <- sprintf("%s.json", cohortsToCreate$cohort_id[i])
+  cohortName <- sub("\\[IrCorrection\\] ", "", cohortsToCreate$cohort_name[i])
+  cohortJson <- SqlRender::readSql(system.file("cohorts", cohortJsonFile, package = "AesiIncidenceCorrection"))
+  baseCohort <- RJSONIO::fromJSON(cohortJson)
+  cohortJson <- RJSONIO::toJSON(baseCohort, digits = 50)
+  printCohortDefinitionFromNameAndJson(name = cohortName,
+                                       json = cohortJson,
+                                       withConcepts = TRUE)
+}
+```
+  
+  
+# Probabilistic reference standard validation cohort definitions
+
+```{r xspec-cohort, echo = FALSE, results = "asis", warning = FALSE, message = FALSE}
+cohortJsonFile <- "12159.json"
+cohortName <- "AESI xSpec"
+cohortJson <- SqlRender::readSql(system.file("cohorts", cohortJsonFile, package = "AesiIncidenceCorrection"))
+baseCohort <- RJSONIO::fromJSON(cohortJson)
+cohortJson <- RJSONIO::toJSON(baseCohort, digits = 50)
+printCohortDefinitionFromNameAndJson(name = cohortName,
+                                     json = cohortJson,
+                                     withConcepts = FALSE)
+```
+
+```{r prev-cohort, echo = FALSE, results = "asis", warning = FALSE, message = FALSE}
+cohortJsonFile <- "12160.json"
+cohortName <- "AESI prevalence"
+cohortJson <- SqlRender::readSql(system.file("cohorts", cohortJsonFile, package = "AesiIncidenceCorrection"))
+baseCohort <- RJSONIO::fromJSON(cohortJson)
+cohortJson <- RJSONIO::toJSON(baseCohort, digits = 50)
+printCohortDefinitionFromNameAndJson(name = cohortName,
+                                     json = cohortJson,
+                                     withConcepts = FALSE)
+```
+

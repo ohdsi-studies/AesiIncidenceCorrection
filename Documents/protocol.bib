@@ -1,0 +1,211 @@
+@article {Lin1435,
+	author = {Li, Xintong and Ostropolets, Anna and Makadia, Rupa and Shoaibi, Azza and Rao, Gowtham and Sena, Anthony G and Martinez-Hernandez, Eugenia and Delmestri, Antonella and Verhamme, Katia and Rijnbeek, Peter R and Duarte-Salles, Talita and Suchard, Marc A and Ryan, Patrick B and Hripcsak, George and Prieto-Alhambra, Daniel},
+	title = {Characterising the background incidence rates of adverse events of special interest for covid-19 vaccines in eight countries: multinational network cohort study},
+	volume = {373},
+	elocation-id = {n1435},
+	year = {2021},
+	doi = {10.1136/bmj.n1435},
+	publisher = {BMJ Publishing Group Ltd},
+	abstract = {Objective To quantify the background incidence rates of 15 prespecified adverse events of special interest (AESIs) associated with covid-19 vaccines. Design Multinational network cohort study. Setting Electronic health records and health claims data from eight countries: Australia, France, Germany, Japan, the Netherlands, Spain, the United Kingdom, and the United States, mapped to a common data model. Participants 126 661 070 people observed for at least 365 days before 1 January 2017, 2018, or 2019 from 13 databases. Main outcome measures Events of interests were 15 prespecified AESIs (non-haemorrhagic and haemorrhagic stroke, acute myocardial infarction, deep vein thrombosis, pulmonary embolism, anaphylaxis, Bell{\textquoteright}s palsy, myocarditis or pericarditis, narcolepsy, appendicitis, immune thrombocytopenia, disseminated intravascular coagulation, encephalomyelitis (including acute disseminated encephalomyelitis), Guillain-Barr{\'e} syndrome, and transverse myelitis). Incidence rates of AESIs were stratified by age, sex, and database. Rates were pooled across databases using random effects meta-analyses and classified according to the frequency categories of the Council for International Organizations of Medical Sciences. Results Background rates varied greatly between databases. Deep vein thrombosis ranged from 387 (95\% confidence interval 370 to 404) per 100 000 person years in UK CPRD GOLD data to 1443 (1416 to 1470) per 100 000 person years in US IBM MarketScan Multi-State Medicaid data among women aged 65 to 74 years. Some AESIs increased with age. For example, myocardial infarction rates in men increased from 28 (27 to 29) per 100 000 person years among those aged 18-34 years to 1400 (1374 to 1427) per 100 000 person years in those older than 85 years in US Optum electronic health record data. Other AESIs were more common in young people. For example, rates of anaphylaxis among boys and men were 78 (75 to 80) per 100 000 person years in those aged 6-17 years and 8 (6 to 10) per 100 000 person years in those older than 85 years in Optum electronic health record data. Meta-analytic estimates of AESI rates were classified according to age and sex. Conclusion This study found large variations in the observed rates of AESIs by age group and sex, showing the need for stratification or standardisation before using background rates for safety surveillance. Considerable population level heterogeneity in AESI rates was found between databases. Data sharing: Patient level data cannot be shared without approval from data custodians owing to local information governance and data protection regulations. Aggregated data, analytical code, and detailed definitions of algorithms for identifying the events are available in a GitHub repository (https://github.com/ohdsi-studies/Covid19VaccineAesiIncidenceCharacterization). The results are available in an interactive web app (https://data.ohdsi.org/Covid19VaccineAesiIncidenceCharacterization).},
+	URL = {https://www.bmj.com/content/373/bmj.n1435},
+	eprint = {https://www.bmj.com/content/373/bmj.n1435.full.pdf},
+	journal = {BMJ}
+}
+
+@ARTICLE{Swerdel2019-fl,
+  title    = "{PheValuator}: Development and evaluation of a phenotype
+              algorithm evaluator",
+  author   = "Swerdel, Joel N and Hripcsak, George and Ryan, Patrick B",
+  abstract = "BACKGROUND: The primary approach for defining disease in
+              observational healthcare databases is to construct phenotype
+              algorithms (PAs), rule-based heuristics predicated on the
+              presence, absence, and temporal logic of clinical observations.
+              However, a complete evaluation of PAs, i.e., determining
+              sensitivity, specificity, and positive predictive value (PPV), is
+              rarely performed. In this study, we propose a tool (PheValuator)
+              to efficiently estimate a complete PA evaluation. METHODS: We
+              used 4 administrative claims datasets: OptumInsight's
+              de-identified ClinformaticsT Datamart (Eden Prairie,MN); IBM
+              MarketScan Multi-State Medicaid); IBM MarketScan Medicare
+              Supplemental Beneficiaries; and IBM MarketScan Commercial Claims
+              and Encounters from 2000 to 2017. Using PheValuator involves (1)
+              creating a diagnostic predictive model for the phenotype, (2)
+              applying the model to a large set of randomly selected subjects,
+              and (3) comparing each subject's predicted probability for the
+              phenotype to inclusion/exclusion in PAs. We used the predictions
+              as a 'probabilistic gold standard' measure to classify
+              positive/negative cases. We examined 4 phenotypes: myocardial
+              infarction, cerebral infarction, chronic kidney disease, and
+              atrial fibrillation. We examined several PAs for each phenotype
+              including 1-time (1X) occurrence of the diagnosis code in the
+              subject's record and 1-time occurrence of the diagnosis in an
+              inpatient setting with the diagnosis code as the primary reason
+              for admission (1X-IP-1stPos). RESULTS: Across phenotypes, the 1X
+              PA showed the highest sensitivity/lowest PPV among all PAs.
+              1X-IP-1stPos yielded the highest PPV/lowest sensitivity.
+              Specificity was very high across algorithms. We found similar
+              results between algorithms across datasets. CONCLUSION:
+              PheValuator appears to show promise as a tool to estimate PA
+              performance characteristics.",
+  journal  = "J. Biomed. Inform.",
+  volume   =  97,
+  pages    = "103258",
+  month    =  sep,
+  year     =  2019,
+  keywords = "Diagnostic predictive modeling; Phenotype algorithms; Validation",
+  language = "en"
+}
+
+@ARTICLE{Swerdel2022-pi,
+  title    = "{PheValuator} 2.0: Methodological improvements for the
+              {PheValuator} approach to semi-automated phenotype algorithm
+              evaluation",
+  author   = "Swerdel, Joel N and Schuemie, Martijn and Murray, Gayle and Ryan,
+              Patrick B",
+  abstract = "PURPOSE: Phenotype algorithms are central to performing analyses
+              using observational data. These algorithms translate the clinical
+              idea of a health condition into an executable set of rules
+              allowing for queries of data elements from a database.
+              PheValuator, a software package in the Observational Health Data
+              Sciences and Informatics (OHDSI) tool stack, provides a method to
+              assess the performance characteristics of these algorithms,
+              namely, sensitivity, specificity, and positive and negative
+              predictive value. It uses machine learning to develop predictive
+              models for determining a probabilistic gold standard of subjects
+              for assessment of cases and non-cases of health conditions.
+              PheValuator was developed to complement or even replace the
+              traditional approach of algorithm validation, i.e., by expert
+              assessment of subject records through chart review. Results in
+              our first PheValuator paper suggest a systematic underestimation
+              of the PPV compared to previous results using chart review. In
+              this paper we evaluate modifications made to the method designed
+              to improve its performance. METHODS: The major changes to
+              PheValuator included allowing all diagnostic conditions, clinical
+              observations, drug prescriptions, and laboratory measurements to
+              be included as predictors within the modeling process whereas in
+              the prior version there were significant restrictions on the
+              included predictors. We also have allowed for the inclusion of
+              the temporal relationships of the predictors in the model. To
+              evaluate the performance of the new method, we compared the
+              results from the new and original methods against results found
+              from the literature using traditional validation of algorithms
+              for 19 phenotypes. We performed these tests using data from five
+              commercial databases. RESULTS: In the assessment aggregating all
+              phenotype algorithms, the median difference between the
+              PheValuator estimate and the gold standard estimate for PPV was
+              reduced from -21 (IQR -34, -3) in Version 1.0 to 4 (IQR -3, 15)
+              using Version 2.0. We found a median difference in specificity of
+              3 (IQR 1, 4.25) for Version 1.0 and 3 (IQR 1, 4) for Version 2.0.
+              The median difference between the two versions of PheValuator and
+              the gold standard for estimates of sensitivity was reduced from
+              -39 (-51, -20) to -16 (-34, -6). CONCLUSION: PheValuator 2.0
+              produces estimates for the performance characteristics for
+              phenotype algorithms that are significantly closer to estimates
+              from traditional validation through chart review compared to
+              version 1.0. With this tool in researcher's toolkits, methods,
+              such as quantitative bias analysis, may now be used to improve
+              the reliability and reproducibility of research studies using
+              observational data.",
+  journal  = "J. Biomed. Inform.",
+  volume   =  135,
+  pages    = "104177",
+  month    =  nov,
+  year     =  2022,
+  keywords = "Phenotype algorithms; Positive predictive value; Sensitivity;
+              Specificity",
+  language = "en"
+}
+
+@ARTICLE{Hripcsak2015-cl,
+  title    = "Observational Health Data Sciences and Informatics ({OHDSI)}:
+              Opportunities for Observational Researchers",
+  author   = "Hripcsak, George and Duke, Jon D and Shah, Nigam H and Reich,
+              Christian G and Huser, Vojtech and Schuemie, Martijn J and
+              Suchard, Marc A and Park, Rae Woong and Wong, Ian Chi Kei and
+              Rijnbeek, Peter R and van der Lei, Johan and Pratt, Nicole and
+              Nor{\'e}n, G Niklas and Li, Yu-Chuan and Stang, Paul E and
+              Madigan, David and Ryan, Patrick B",
+  journal  = "Studies in health technology and informatics",
+  volume   =  216,
+  pages    = "574-578",
+  year     =  2015,
+  language = "en"
+}
+
+@article{10.1093/jamia/ocu023,
+    author = {Voss, Erica A and Makadia, Rupa and Matcho, Amy and Ma, Qianli and Knoll, Chris and Schuemie, Martijn and DeFalco, Frank J and Londhe, Ajit and Zhu, Vivienne and Ryan, Patrick B},
+    title = "{Feasibility and utility of applications of the common data model to multiple, disparate observational health databases}",
+    journal = {Journal of the American Medical Informatics Association},
+    volume = {22},
+    number = {3},
+    pages = {553-564},
+    year = {2015},
+    month = {02},
+    abstract = "{Objectives To evaluate the utility of applying the Observational Medical Outcomes Partnership (OMOP) Common Data Model (CDM) across multiple observational databases within an organization and to apply standardized analytics tools for conducting observational research.Materials and methods Six deidentified patient-level datasets were transformed to the OMOP CDM. We evaluated the extent of information loss that occurred through the standardization process. We developed a standardized analytic tool to replicate the cohort construction process from a published epidemiology protocol and applied the analysis to all 6 databases to assess time-to-execution and comparability of results.Results Transformation to the CDM resulted in minimal information loss across all 6 databases. Patients and observations excluded were due to identified data quality issues in the source system, 96\\% to 99\\% of condition records and 90\\% to 99\\% of drug records were successfully mapped into the CDM using the standard vocabulary. The full cohort replication and descriptive baseline summary was executed for 2 cohorts in 6 databases in less than 1 hour.Discussion The standardization process improved data quality, increased efficiency, and facilitated cross-database comparisons to support a more systematic approach to observational research. Comparisons across data sources showed consistency in the impact of inclusion criteria, using the protocol and identified differences in patient characteristics and coding practices across databases.Conclusion Standardizing data structure (through a CDM), content (through a standard vocabulary with source code mappings), and analytics can enable an institution to apply a network-based approach to observational research across multiple, disparate observational health databases.}",
+    issn = {1067-5027},
+    doi = {10.1093/jamia/ocu023},
+    url = {https://doi.org/10.1093/jamia/ocu023},
+    eprint = {https://academic.oup.com/jamia/article-pdf/22/3/553/34145431/ocu023.pdf},
+}
+
+@misc{COVID19AESIs,
+   title = {Background Rates of Adverse Events of Special Interest for COVID-19 Vaccine Safety Monitoring Protocol.},
+   number = {2021.10.14},
+   month = {2021.01.12},
+   url = {https://www.bestinitiative.org/wp-content/uploads/2021/02/C19-Vaccine-Safety-AESI-Background-Rate-Protocol-FINAL-2020.pdf},
+   year = {2021},
+   type = {Web Page}
+}
+
+@misc{BrightonAESIs,
+   title = {Priority List of Adverse Events of Special Interest: COVID-19},
+   number = {2020.06.10},
+   month = {2020.06.10},
+   url = {https://brightoncollaboration.us/priority-list-aesi-covid/},
+   year = {2020},
+   type = {Web Page}
+}
+
+@article{MOLL2023333,
+title = {Background rates of adverse events of special interest for COVID-19 vaccine safety monitoring in the United States, 2019–2020},
+journal = {Vaccine},
+volume = {41},
+number = {2},
+pages = {333-353},
+year = {2023},
+issn = {0264-410X},
+doi = {https://doi.org/10.1016/j.vaccine.2022.11.003},
+url = {https://www.sciencedirect.com/science/article/pii/S0264410X22013731},
+author = {Keran Moll and Bradley Lufkin and Kathryn R. Fingar and Cindy {Ke Zhou} and Ellen Tworkoski and Chianti Shi and Shayan Hobbi and Mao Hu and Minya Sheng and Jillian McCarty and Shanlai Shangguan and Timothy Burrell and Yoganand Chillarige and Jeff Beers and Patrick Saunders-Hastings and Stella Muthuri and Kathryn Edwards and Steven Black and Jeff Kelman and Christian Reich and Kandace L. Amend and Djeneba Audrey Djibo and Daniel Beachler and Rachel P. Ogilvie and Alex Secora and Cheryl N. McMahill-Walraven and John D. Seeger and Patricia Lloyd and Deborah Thompson and Rositsa Dimova and Thomas MaCurdy and Joyce Obidi and Steve Anderson and Richard Forshee and Hui-Lee Wong and Azadeh Shoaibi},
+keywords = {Background rates, Vaccine safety surveillance, COVID-19, Adverse events},
+abstract = {Background
+The U.S. Food and Drug Administration (FDA) Biologics Effectiveness and Safety (BEST) Initiative conducts active surveillance of adverse events of special interest (AESI) after COVID-19 vaccination. Historical incidence rates (IRs) of AESI are comparators to evaluate safety.
+Methods
+We estimated IRs of 17 AESI in six administrative claims databases from January 1, 2019, to December 11, 2020: Medicare claims for adults ≥ 65 years and commercial claims (Blue Health Intelligence®, CVS Health, HealthCore Integrated Research Database, IBM® MarketScan® Commercial Database, Optum pre-adjudicated claims) for adults < 65 years. IRs were estimated by sex, age, race/ethnicity (Medicare), and nursing home residency (Medicare) in 2019 and for specific periods in 2020.
+Results
+The study included >100 million enrollees annually. In 2019, rates of most AESI increased with age. However, compared with commercially insured adults, Medicare enrollees had lower IRs of anaphylaxis (11 vs 12–19 per 100,000 person-years), appendicitis (80 vs 117–155), and narcolepsy (38 vs 41–53). Rates were higher in males than females for most AESI across databases and varied by race/ethnicity and nursing home status (Medicare). Acute myocardial infarction (Medicare) and anaphylaxis (all databases) IRs varied by season. IRs of most AESI were lower during March–May 2020 compared with March–May 2019 but returned to pre-pandemic levels after May 2020. However, rates of Bell’s palsy, Guillain-Barré syndrome, narcolepsy, and hemorrhagic/non-hemorrhagic stroke remained lower in multiple databases after May 2020, whereas some AESI (e.g., disseminated intravascular coagulation) exhibited higher rates after May 2020 compared with 2019.
+Conclusion
+AESI background rates varied by database and demographics and fluctuated in March–December 2020, but most returned to pre-pandemic levels after May 2020. It is critical to standardize demographics and consider seasonal and other trends when comparing historical rates with post-vaccination AESI rates in the same database to evaluate COVID-19 vaccine safety.}
+}
+
+@ARTICLE{DerSimonian1986-co,
+  title    = "Meta-analysis in clinical trials",
+  author   = "DerSimonian, R and Laird, N",
+  journal  = "Controlled clinical trials",
+  volume   =  7,
+  number   =  3,
+  pages    = "177-188",
+  month    =  sep,
+  year     =  1986,
+  language = "en"
+}
+
+@misc{WHO_CIOMS,
+   title = {Guidelines for Preparing Core Clinical-Safety Information on Drugs.},
+   url = {https://cioms.ch/wpcontent/uploads/2018/03/Guidelines-for-Preparing-Core-Clinical-Safety-Info-Drugs-Report-of-CIOMSWorking-Group-III-and-V.pdf},
+   year = {2018},
+   type = {Web Page}
+}
+
+Guidelines for Preparing Core Clinical-Safety Information on Drugs. 1999. .
+

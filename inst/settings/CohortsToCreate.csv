@@ -1,0 +1,20 @@
+atlas_id,cohort_id,cohort_name,logic_description,generate_stats
+12100,12100,[IrCorrection] Persons observed on 1 Jan 2017-2019,NA,TRUE
+12083,12083,[IrCorrection] Narcolepsy,NA,TRUE
+12084,12084,[IrCorrection] Anaphylaxis,NA,TRUE
+12085,12085,[IrCorrection] Bells Palsy,NA,TRUE
+12086,12086,[IrCorrection] Encephalomyelitis,NA,TRUE
+12087,12087,[IrCorrection] Guillain Barre Syndrome,NA,TRUE
+12088,12088,[IrCorrection] Acute myocardial infarction,NA,TRUE
+12089,12089,[IrCorrection] Myocarditis Pericarditis,NA,TRUE
+12090,12090,[IrCorrection] Immune thrombocytopenia,NA,TRUE
+12091,12091,[IrCorrection] Disseminated intravascular coagulation,NA,TRUE
+12092,12092,[IrCorrection] Appendicitis,NA,TRUE
+12093,12093,[IrCorrection] Transverse myelitis,NA,TRUE
+12094,12094,[IrCorrection] Hemorrhagic stroke,NA,TRUE
+12095,12095,[IrCorrection] Deep vein thrombosis,NA,TRUE
+12096,12096,[IrCorrection] Non-hemorrhagic stroke,NA,TRUE
+12097,12097,[IrCorrection] Pulmonary embolism,NA,TRUE
+12098,12098,[IrCorrection] Thrombosis with thrombocytopenia,NA,TRUE
+12159,12159,[IrCorrection] AESI xSpec,NA,TRUE
+12160,12160,[IrCorrection] AESI prevalence,NA,TRUE
