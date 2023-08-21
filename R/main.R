@@ -4,7 +4,7 @@ execute <- function(connectionDetails,
                     outputFolder,
                     cohortRef,
                     databaseId,
-                    cohrotIds = NULL,
+                    cohortIds = NULL,
                     targetCohortIds = NULL,
                     outcomeCohortIds = NULL,
                     validationCohortIds = NULL,
@@ -17,6 +17,7 @@ execute <- function(connectionDetails,
                     runOutcomeValidation = FALSE,
                     runIncidenceAnalysis = FALSE,
                     runIncidenceCorrection = FALSE,
+                    evaluateIrCorrection = FALSE,
                     runMetaAnalysis = FALSE,
                     exportResults = FALSE) {
 
@@ -75,11 +76,14 @@ execute <- function(connectionDetails,
   }
 
   if (runIncidenceCorrection) {
-    print("TODO")
+    AesiIncidenceCorrection::runIncidenceCorrection(
+      outputFolder = outputFolder,
+      cohortRef = cohortRef
+    )
   }
 
-  if (runMetaAnalysis) {
-    print("TODO")
+  if (evaluateIrCorrection) {
+    AesiIncidenceCorrection::evaluateIrCorrection(outputFolder = outputFolder)
   }
 
   if (exportResults) {

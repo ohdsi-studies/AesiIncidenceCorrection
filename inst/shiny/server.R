@@ -3,38 +3,55 @@ shiny::shinyServer(function(input, output) {
 
   getValidationResultsReactive <- shiny::reactive(x = {
     data <- validationTable %>%
-      dplyr::filter(.data$source %in% input$database1 &
-                      .data$oName %in% input$outcome1)
+      dplyr::filter(
+        .data$source %in% input$database1 &
+          .data$oName %in% input$outcome1
+      )
     return(data)
   })
 
   output$validationResults <- DT::renderDataTable(expr = {
     data <-  getValidationResultsReactive()
-    table <- DT::datatable(data,
-                           rownames = FALSE,
-                           class = "stripe compact",
-                           options = list(autoWidth = FALSE,
-                                          scrollX = TRUE))
+    table <- DT::datatable(
+      data,
+      rownames = FALSE,
+      class = "stripe compact",
+      options = list(autoWidth = FALSE,
+                     scrollX = TRUE)
+    )
     return(table)
   })
 
 
   getIrResultsReactive <- shiny::reactive(x = {
     data <- irTable %>%
-      dplyr::filter(.data$method %in% input$method1 &
-                      .data$source %in% input$database1 &
-                      .data$tName %in% input$target1 &
-                      .data$oName %in% input$outcome1)
+      dplyr::filter(
+        .data$method %in% input$method1 &
+        .data$source %in% input$database1 &
+        .data$tName %in% input$target1 &
+        .data$oName %in% input$outcome1
+      ) %>%
+      dplyr::select(
+        -c(
+          atRisk,
+          personDays,
+          outcomes,
+          cOutcomes,
+          cPersonDays
+        )
+      )
     return(data)
   })
 
   output$irResults <- DT::renderDataTable(expr = {
     data <- getIrResultsReactive()
-    table <- DT::datatable(data,
-                           rownames = FALSE,
-                           class = "stripe compact",
-                           options = list(autoWidth = FALSE,
-                                          scrollX = TRUE))
+    table <- DT::datatable(
+      data,
+      rownames = FALSE,
+      class = "stripe compact",
+      options = list(autoWidth = FALSE,
+                     scrollX = TRUE)
+    )
     return(table)
   })
 
@@ -43,7 +60,8 @@ shiny::shinyServer(function(input, output) {
     plot <- plotIrForest2(dbMaIrSummary,
                           targetName = input$target2,
                           outcomeName = input$outcome2,
-                          method = input$method2)
+                          method = input$method2,
+                          interval = input$interval)
     return(plot)
   })
 
@@ -69,6 +87,7 @@ shiny::shinyServer(function(input, output) {
                            class = "stripe compact",
                            options = list(autoWidth = FALSE,
                                           scrollX = TRUE))
+
     return(table)
   })
 

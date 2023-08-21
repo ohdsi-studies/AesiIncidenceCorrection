@@ -1,9 +1,8 @@
 #' @export
-runIncidenceAnalysis <- function(outputFolder,     # outputFolder <- "G:/aesiIncidenceCorrection"
-                                 cohortRef) {
+runIncidenceCorrection <- function(outputFolder,     # outputFolder <- "G:/aesiIncidenceCorrection"
+                                   cohortRef) {
 
   databaseIds <- cdmSources$databaseName
-
 
   irSummary <- tibble::tibble()
   valSummary <- tibble::tibble()
@@ -100,20 +99,20 @@ correctIpIr <- function(row,       # row <- irSummary[1, ]
   daysPerPerson <- personDays / personsAtRisk
 
   if (method == "sensSpec") {
-    correctedOutcomes <- (outcomes - (1 - spec) * personsAtRisk) / (sens - (1 - spec)) # 14328
+    correctedOutcomes <- (outcomes - (1 - spec) * personsAtRisk) / (sens - (1 - spec))
   }
 
   if (method == "ppvNpv") {
-    correctedOutcomes <- (outcomes * ppv + (personsAtRisk - outcomes) * (1 - npv)) # 22329.75
+    correctedOutcomes <- (outcomes * ppv + (personsAtRisk - outcomes) * (1 - npv))
   }
 
   if (method == "sensPpv") {
-    correctedOutcomes <- outcomes * ppv / sens # 16222.46
+    correctedOutcomes <- outcomes * ppv / sens
   }
 
   if (method == "fpRate") {
     fpRate <- outcomes * (1 - spec) / personDays
-    correctedOutcomes <- (outcomes - (fpRate * personDays)) / sens # 17955.81
+    correctedOutcomes <- (outcomes - (fpRate * personDays)) / sens
   }
 
   if (correctedOutcomes >= 0) {

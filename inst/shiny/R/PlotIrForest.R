@@ -1,11 +1,12 @@
-plotIrForest2 <- function(dbMaIrSmmary,
+plotIrForest2 <- function(dbMaIrSummary,
                           targetName,
                           outcomeName,
-                          method) {
+                          method,
+                          interval) {
 
-  plotData <- dbMaIrSmmary[dbMaIrSmmary$outcomeName %in% outcomeName &
-                             dbMaIrSmmary$targetName %in% targetName &
-                             dbMaIrSmmary$method %in% method, ]
+  plotData <- dbMaIrSummary[dbMaIrSummary$outcomeName %in% outcomeName &
+                             dbMaIrSummary$targetName %in% targetName &
+                             dbMaIrSummary$method %in% method, ]
 
   plotData <- plotData %>%
     dplyr::mutate(
@@ -13,7 +14,23 @@ plotIrForest2 <- function(dbMaIrSmmary,
       sourceName = sub("_v\\d{4}", "", sourceName),
     )
 
-  limits <- c(min(plotData$irLower), max(plotData$irUpper))
+  if (interval == "ci") {
+    limits <- c(min(plotData$irLowerCi), max(plotData$irUpperCi))
+    plotData <- plotData %>%
+      dplyr::mutate(
+        irLower = irLowerCi,
+        irUpper = irUpperCi,
+      )
+  }
+
+  if (interval == "prediction") {
+    limits <- c(min(plotData$irLowerPredict), max(plotData$irUpperPredict))
+    plotData <- plotData %>%
+      dplyr::mutate(
+        irLower = irLowerPredict,
+        irUpper = irUpperPredict,
+      )
+  }
 
   plot <- ggplot2::ggplot(
     data = plotData,

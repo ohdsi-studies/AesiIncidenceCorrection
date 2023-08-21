@@ -13,7 +13,7 @@ Depends:
 Imports:
     SqlRender (>= 1.6.3),
     PheValuator (>= 2.1.10),
-    CohortIncidence (>=3.1.1).
+    CohortIncidence (>= 3.1.1),
     ggplot2 (>= 3.4.1),
     ParallelLogger (>= 3.1.0),
     dplyr (>= 1.1.0),

@@ -45,11 +45,11 @@ cdmSources <- cdmSources %>% dplyr::filter(.data$cdmDatabaseSchema %in% database
 cdmSources$order <- match(cdmSources$sourceKey, databaseNames)
 cdmSources <- cdmSources[order(cdmSources$order), ]
 cdmSources$order <- NULL
-# cdmSources <- cdmSources[2:8, ]
+cdmSources <- cdmSources[1:7, ] # jdmc phevaluator failing
 databaseIds <- cdmSources$databaseName
 
 
-for (i in 1:nrow(cdmSources)) { # i = 4
+for (i in 1:nrow(cdmSources)) { # i = 8
 
   ROhdsiWebApi::authorizeWebApi(baseUrl, "windows")
 
@@ -80,10 +80,10 @@ for (i in 1:nrow(cdmSources)) { # i = 4
     cohortTable = cohortTable,
     createCohortTable = FALSE,
     createCohorts = FALSE,
-    runOutcomeValidation = TRUE,
+    runOutcomeValidation = FALSE,
     runIncidenceAnalysis = FALSE,
     runIncidenceCorrection = FALSE,
-    evaluateIrCorrection = FALSE
+    evaluateIrCorrection = TRUE
   )
 }
 

@@ -19,11 +19,13 @@ evaluateIrCorrection <- function(outputFolder) {     # outputFolder <- "G:/aesiI
 }
 
 
-getUncorrectedIrCis <- function(irSummary) {
+getUncorrectedIrCis <- function(irSummary) {  # irSummary <- correctedIrSummary
+
   irSummary <- irSummary %>% dplyr::mutate(
     personYears = personDays / 365.25,
     correctedPersonYears = correctedPersonDays / 365.25
   )
+
   irs <- irSummary %>%
     dplyr::select(
       sourceName,
@@ -41,10 +43,12 @@ getUncorrectedIrCis <- function(irSummary) {
       outcomeCohortDefinitionId,
       .keep_all = TRUE
     )
+
   irGroups <- split(
     x = irs,
     f = paste(irs$targetCohortDefinitionId, irs$outcomeCohortDefinitionId)
   )
+
   irCis <- lapply(
     X = irGroups,
     FUN = computeUncorrectedIrCis
@@ -53,8 +57,10 @@ getUncorrectedIrCis <- function(irSummary) {
   return(irCis)
 }
 
-computeUncorrectedIrCis <- function(irGroup) { # irGroup <- irGroups[[1]]
+computeUncorrectedIrCis <- function(irGroup) { # irGroup <- irGroups[[5]]
+
   irGroup <- irGroup %>% dplyr::filter(outcomes > 0)
+
   irRnd <- meta::metarate(
     data = irGroup,
     event = outcomes,
@@ -64,16 +70,20 @@ computeUncorrectedIrCis <- function(irGroup) { # irGroup <- irGroups[[1]]
     sm = "IRLN",
     random = TRUE,
     method.tau = "DL",
-    irscale = 100,
+    irscale = 100000,
     irunit = "person-years"
   )
+
   irGroup <- irGroup %>%
     dplyr::mutate(
       method = "uncorrected",
-      ir = exp(irRnd$TE) * 100,
-      irLower = irRnd$lower * 100,
-      irUpper = irRnd$upper * 100,
-      intervalWidth = irRnd$upper * 100 - irRnd$lower * 100,
+      ir = exp(irRnd$TE) * 100000,
+      irLowerCi = irRnd$lower * 100000,
+      irUpperCi = irRnd$upper * 100000,
+      ciIntervalWidth = irRnd$upper * 100000 - irRnd$lower * 100000,
+      irLowerPredict = rep(NA, nrow(irGroup)),
+      irUpperPredict = rep(NA, nrow(irGroup)),
+      predictIntervalWidth = rep(NA, nrow(irGroup))
     ) %>%
     dplyr::relocate(
       method
@@ -82,12 +92,13 @@ computeUncorrectedIrCis <- function(irGroup) { # irGroup <- irGroups[[1]]
 }
 
 
-
 getCorrectedIrCis <- function(irSummary) {
+
   irSummary <- irSummary %>% dplyr::mutate(
     personYears = personDays / 365.25,
     correctedPersonYears = correctedPersonDays / 365.25
   )
+
   irs <- irSummary %>%
     dplyr::mutate(
       correctedPersonYears = ifelse(method == "fpRate", personYears, correctedPersonYears) # person-time correction made when calculating fpRate
@@ -110,20 +121,25 @@ getCorrectedIrCis <- function(irSummary) {
       outcomeCohortDefinitionId,
       .keep_all = TRUE
     )
+
   irGroups <- split(
     x = irs,
     f = paste(irs$method, irs$targetCohortDefinitionId, irs$outcomeCohortDefinitionId)
   )
+
   irCis <- lapply(
     X = irGroups,
     FUN = computeCorrectedIrCis
   )
+
   irCis <- dplyr::bind_rows(irCis)
   return(irCis)
 }
 
 computeCorrectedIrCis <- function(irGroup) { # irGroup <- irGroups[[1]]
+
   irGroup <- irGroup %>% dplyr::filter(outcomes > 0)
+
   irRnd <- meta::metarate(
     data = irGroup,
     event = outcomes,
@@ -133,16 +149,21 @@ computeCorrectedIrCis <- function(irGroup) { # irGroup <- irGroups[[1]]
     sm = "IRLN",
     random = TRUE,
     method.tau = "DL",
-    irscale = 100,
+    irscale = 100000,
     irunit = "person-years"
   )
+
   irGroup <- irGroup %>%
     dplyr::mutate(
-      ir = exp(irRnd$TE) * 100,
-      irLower = irRnd$lower * 100,
-      irUpper = irRnd$upper * 100,
-      intervalWidth = irRnd$upper * 100 - irRnd$lower * 100
+      ir = exp(irRnd$TE) * 100000,
+      irLowerCi = irRnd$lower * 100000,
+      irUpperCi = irRnd$upper * 100000,
+      ciIntervalWidth = irRnd$upper * 100000 - irRnd$lower * 100000,
+      irLowerPredict = rep(NA, nrow(irGroup)),
+      irUpperPredict = rep(NA, nrow(irGroup)),
+      predictIntervalWidth = rep(NA, nrow(irGroup))
     )
+
   return(irGroup)
 }
 
@@ -173,18 +194,21 @@ computeIrMa <- function(irSummary) {
     f = paste(irs$method, irs$targetCohortDefinitionId, irs$outcomeCohortDefinitionId)
   )
 
-  maResults <- lapply(
+  maDlResults <- lapply(
     X = irGroups,
     FUN = computeMa
   )
-  maResults <- dplyr::bind_rows(maResults)
+
+  maResults <- dplyr::bind_rows(maDlResults)
+
   return(maResults)
 }
 
 
-computeMa <- function(irGroup) { # irGroup <- irGroups[[1]]
+computeMa <- function(irGroup) { # irGroup <- irGroups[["uncorrected 12100 12088"]]
 
   irGroup <- irGroup %>% dplyr::filter(outcomes > 0)
+
   irRnd <- meta::metarate(
     data = irGroup,
     event = outcomes,
@@ -194,26 +218,31 @@ computeMa <- function(irGroup) { # irGroup <- irGroups[[1]]
     sm = "IRLN",
     random = TRUE,
     method.tau = "DL",
-    irscale = 100,
-    irunit = "person-years"
+    irscale = 100000,
+    irunit = "person-years",
+    prediction = TRUE
   )
 
   irMa <- tibble::tibble(
     method = irGroup$method[1],
-    sourceName = "rndMa",
+    sourceName = "dlMa",
     targetCohortDefinitionId = irGroup$targetCohortDefinitionId[1],
     targetName = irGroup$targetName[1],
     outcomeCohortDefinitionId = irGroup$outcomeCohortDefinitionId[1],
     outcomeName = irGroup$outcomeName[1],
-    ir = exp(irRnd$TE.random) * 100,
-    irLower = exp(irRnd$lower.predict) * 100,
-    irUpper = exp(irRnd$upper.predict) * 100,
-    intervalWidth = (exp(irRnd$upper.predict) * 100) - (exp(irRnd$lower.predict) * 100),
+    ir = exp(irRnd$TE.random) * 100000,
+    irLowerCi = exp(irRnd$lower.random) * 100000,
+    irUpperCi = exp(irRnd$upper.random) * 100000,
+    ciIntervalWidth = exp(irRnd$upper.random) * 100000 - exp(irRnd$lower.random) * 100000,
+    irLowerPredict = exp(irRnd$lower.predict) * 100000,
+    irUpperPredict = exp(irRnd$upper.predict) * 100000,
+    predictIntervalWidth = (exp(irRnd$upper.predict) * 100000) - (exp(irRnd$lower.predict) * 100000),
     seIr = irRnd$seTE.random,
     irTau2 = irRnd$tau2,
     irTau = irRnd$tau,
     i2 = irRnd$I2,
     k = irRnd$k
   )
+
   return(irMa)
 }

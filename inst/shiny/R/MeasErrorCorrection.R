@@ -8,8 +8,8 @@ getCorrectedIrIp <- function(row,
   atRisk <- row$atRisk
   personDays <- row$personDays
   outcomes <- row$outcomes
-  ip100p <- row$ip100p
-  ir100p <- row$ir100py
+  ip100k_p <- row$ip100k_p
+  ir100k_py <- row$ir100k_py
   daysPerPerson <- personDays / atRisk
 
   if (method == "sensSpec") {
@@ -33,40 +33,40 @@ getCorrectedIrIp <- function(row,
     cPersonDays <- personDays + personDaysDiff
 
     # IP
-    cIp100p <- cOutcomes / atRisk * 100
-    ipDiff <- cIp100p - ip100p
-    ipRel <- cIp100p / ip100p
+    cIp100k_p <- cOutcomes / atRisk * 100000
+    ipDiff <- cIp100k_p - ip100k_p
+    ipRel <- cIp100k_p / ip100k_p
     eameIp <- abs(log(ipRel))
 
     # IR
     if (method == "fpRate") {
-      cIr100py <- cOutcomes / personDays * 100 * 365
+      cIr100k_py <- cOutcomes / personDays * 100000 * 365
       cPersonDays <- personDays
     } else {
-      cIr100py <- cOutcomes / cPersonDays * 100 * 365
+      cIr100k_py <- cOutcomes / cPersonDays * 100000 * 365
     }
-    irDiff <- cIr100py - ir100p
-    irRel <- cIr100py / ir100p
+    irDiff <- cIr100k_py - ir100k_py
+    irRel <- cIr100k_py / ir100k_py
     eameIr <- abs(log(irRel))
 
   } else {
-    cIp100p <- NA
+    cIp100k_p <- NA
     ipDiff <- NA
     ipRel <- NA
     eameIp <- NA
     cPersonDays <- NA
-    cIr100py <- NA
+    cIr100k_py <- NA
     irDiff <- NA
     irRel <- NA
     eameIr <- NA
   }
   row$cOutcomes <- round(cOutcomes, 0)
-  row$cIp100p <- round(cIp100p, 3)
+  row$cIp100k_p <- round(cIp100k_p, 3)
   row$ipDiff <- round(ipDiff, 3)
   row$ipRel <- round(ipRel, 3)
   row$eameIp <- round(eameIp, 3)
   row$cPersonDays <- round(cPersonDays, 0)
-  row$cIr100py <- round(cIr100py, 3)
+  #row$cIr100py <- round(cIr100k_py, 3)
   row$irDiff <- round(irDiff, 3)
   row$irRel <- round(irRel, 3)
   row$eameIr <- round(eameIr, 3)

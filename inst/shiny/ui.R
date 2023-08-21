@@ -8,7 +8,7 @@ sidebarMenu <- shinydashboard::sidebarMenu(
   shinydashboard::menuItem(text = "Validation & IRs",
                            tabName = "validationIr"),
 
-  shinydashboard::menuItem(text = " IR forest plots",
+  shinydashboard::menuItem(text = "IR forest plots",
                            tabName = "irForestPlots"),
 
   shinydashboard::menuItem(text = "Correction thresholds",
@@ -17,14 +17,14 @@ sidebarMenu <- shinydashboard::sidebarMenu(
   shiny::conditionalPanel(condition = "input.tabs == 'validationIr'",
                           shinyWidgets::pickerInput(inputId = "method1",
                                                     label = "Method",
-                                                    choices = methods,
-                                                    selected = methods[1],
+                                                    choices = methods[2:5],
+                                                    selected = methods[4],
                                                     multiple = TRUE),
 
                           shinyWidgets::pickerInput(inputId = "database1",
                                                     label = "Database",
-                                                    choices = databases,
-                                                    selected = databases,
+                                                    choices = databases[1:7],
+                                                    selected = databases[1:7],
                                                     multiple = TRUE),
 
                           shinyWidgets::pickerInput(inputId = "target1",
@@ -36,7 +36,7 @@ sidebarMenu <- shinydashboard::sidebarMenu(
                           shinyWidgets::pickerInput(inputId = "outcome1",
                                                     label = "Outcome",
                                                     choices = outcomes,
-                                                    selected = outcomes[10],
+                                                    selected = outcomes[4],
                                                     multiple = TRUE)),
 
   shiny::conditionalPanel(condition = "input.tabs == 'irForestPlots'",
@@ -50,20 +50,26 @@ sidebarMenu <- shinydashboard::sidebarMenu(
                           shinyWidgets::pickerInput(inputId = "outcome2",
                                                     label = "Outcome",
                                                     choices = outcomes,
-                                                    selected = outcomes[10],
+                                                    selected = outcomes[4],
                                                     multiple = TRUE),
                           shinyWidgets::pickerInput(inputId = "method2",
                                                     label = "Method",
                                                     choices = methods,
                                                     selected = methods,
-                                                    multiple = TRUE)
+                                                    multiple = TRUE),
+
+                          shinyWidgets::pickerInput(inputId = "interval",
+                                                    label = "Interval",
+                                                    choices = intervals,
+                                                    selected = intervals[1],
+                                                    multiple = FALSE)
   ),
 
   shiny::conditionalPanel(condition = "input.tabs == 'correctionThresholds'",
                           shinyWidgets::pickerInput(inputId = "method3",
                                                     label = "Method",
-                                                    choices = methods,
-                                                    selected = methods[1],
+                                                    choices = methods[2:5],
+                                                    selected = methods[2],
                                                     multiple = FALSE),
 
                           shinyWidgets::pickerInput(inputId = "database3",
