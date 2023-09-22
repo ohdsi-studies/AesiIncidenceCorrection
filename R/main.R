@@ -15,6 +15,7 @@ execute <- function(connectionDetails,
                     createCohorts = FALSE,
                     createValidationCohorts = FALSE,
                     runOutcomeValidation = FALSE,
+                    runSubgroupOutcomeValidation = FALSE,
                     runIncidenceAnalysis = FALSE,
                     runIncidenceCorrection = FALSE,
                     evaluateIrCorrection = FALSE,
@@ -58,6 +59,18 @@ execute <- function(connectionDetails,
       outputFolder = outputFolder,
       databaseId = databaseId,
       cohortRef = cohortRef
+    )
+  }
+
+  if (runSubgroupOutcomeValidation) {
+    AesiIncidenceCorrection::runSubgroupOutcomeValidation(
+      baseUrl = baseUrl,
+      connectionDetails = connectionDetails,
+      cdmDatabaseSchema = cdmDatabaseSchema,
+      cohortDatabaseSchema = cohortDatabaseSchema,
+      cohortTable = cohortTable,
+      outputFolder = outputFolder,
+      databaseId = databaseId
     )
   }
 

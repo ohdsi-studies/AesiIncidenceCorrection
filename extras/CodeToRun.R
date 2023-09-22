@@ -29,10 +29,10 @@ databaseNames <- c(
   "cdm_optum_extended_dod_v2434",
   "cdm_truven_ccae_v2435",
   "cdm_truven_mdcd_v2359",
-  "cdm_truven_mdcr_v2433",
-  "cdm_cprd_v2358",
-  "cdm_ims_germany_v2352",
-  "cdm_jmdc_v2432"
+  "cdm_truven_mdcr_v2433"
+  #"cdm_cprd_v2358"
+  #"cdm_ims_germany_v2352",
+  #"cdm_jmdc_v2432"
 )
 
 cdmSources <- ROhdsiWebApi::getCdmSources(baseUrl)
@@ -45,11 +45,10 @@ cdmSources <- cdmSources %>% dplyr::filter(.data$cdmDatabaseSchema %in% database
 cdmSources$order <- match(cdmSources$sourceKey, databaseNames)
 cdmSources <- cdmSources[order(cdmSources$order), ]
 cdmSources$order <- NULL
-cdmSources <- cdmSources[1:7, ] # jdmc phevaluator failing
 databaseIds <- cdmSources$databaseName
 
 
-for (i in 1:nrow(cdmSources)) { # i = 8
+for (i in 1:nrow(cdmSources)) { # i = 4
 
   ROhdsiWebApi::authorizeWebApi(baseUrl, "windows")
 
@@ -81,9 +80,10 @@ for (i in 1:nrow(cdmSources)) { # i = 8
     createCohortTable = FALSE,
     createCohorts = FALSE,
     runOutcomeValidation = FALSE,
+    runSubgroupOutcomeValidation = TRUE,
     runIncidenceAnalysis = FALSE,
     runIncidenceCorrection = FALSE,
-    evaluateIrCorrection = TRUE
+    evaluateIrCorrection = FALSE
   )
 }
 
