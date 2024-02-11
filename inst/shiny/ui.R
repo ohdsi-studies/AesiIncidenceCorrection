@@ -18,13 +18,19 @@ sidebarMenu <- shinydashboard::sidebarMenu(
                           shinyWidgets::pickerInput(inputId = "method1",
                                                     label = "Method",
                                                     choices = methods[2:5],
-                                                    selected = methods[4],
+                                                    selected = methods[2],
                                                     multiple = TRUE),
 
                           shinyWidgets::pickerInput(inputId = "database1",
                                                     label = "Database",
-                                                    choices = databases[1:7],
-                                                    selected = databases[1:7],
+                                                    choices = databases[1:5],
+                                                    selected = databases[1:5],
+                                                    multiple = TRUE),
+
+                          shinyWidgets::pickerInput(inputId = "strata1",
+                                                    label = "Stratum",
+                                                    choices = strata,
+                                                    selected = strata[1],
                                                     multiple = TRUE),
 
                           shinyWidgets::pickerInput(inputId = "target1",
@@ -36,10 +42,21 @@ sidebarMenu <- shinydashboard::sidebarMenu(
                           shinyWidgets::pickerInput(inputId = "outcome1",
                                                     label = "Outcome",
                                                     choices = outcomes,
-                                                    selected = outcomes[4],
+                                                    selected = outcomes[1],
                                                     multiple = TRUE)),
 
   shiny::conditionalPanel(condition = "input.tabs == 'irForestPlots'",
+                          shinyWidgets::pickerInput(inputId = "method2",
+                                                    label = "Method",
+                                                    choices = methods,
+                                                    selected = methods,
+                                                    multiple = TRUE),
+
+                          shinyWidgets::pickerInput(inputId = "strata2",
+                                                    label = "Stratum",
+                                                    choices = strata,
+                                                    selected = strata[1],
+                                                    multiple = FALSE),
 
                           shinyWidgets::pickerInput(inputId = "target2",
                                                     label = "Target",
@@ -50,12 +67,7 @@ sidebarMenu <- shinydashboard::sidebarMenu(
                           shinyWidgets::pickerInput(inputId = "outcome2",
                                                     label = "Outcome",
                                                     choices = outcomes,
-                                                    selected = outcomes[4],
-                                                    multiple = TRUE),
-                          shinyWidgets::pickerInput(inputId = "method2",
-                                                    label = "Method",
-                                                    choices = methods,
-                                                    selected = methods,
+                                                    selected = outcomes[1],
                                                     multiple = TRUE),
 
                           shinyWidgets::pickerInput(inputId = "interval",
@@ -78,6 +90,12 @@ sidebarMenu <- shinydashboard::sidebarMenu(
                                                     selected = databases[1],
                                                     multiple = FALSE),
 
+                          shinyWidgets::pickerInput(inputId = "strata3",
+                                                    label = "Stratum",
+                                                    choices = strata,
+                                                    selected = strata[1],
+                                                    multiple = FALSE),
+
                           shinyWidgets::pickerInput(inputId = "target3",
                                                     label = "Target",
                                                     choices = targets,
@@ -87,7 +105,7 @@ sidebarMenu <- shinydashboard::sidebarMenu(
                           shinyWidgets::pickerInput(inputId = "outcome3",
                                                     label = "Outcome",
                                                     choices = outcomes,
-                                                    selected = outcomes[10],
+                                                    selected = outcomes[1],
                                                     multiple = FALSE),
 
                           shiny::sliderInput(inputId = "sens",
@@ -121,10 +139,10 @@ sidebar <- shinydashboard::dashboardSidebar(sidebarMenu)
 bodyTabItems <- shinydashboard::tabItems(
 
   shinydashboard::tabItem(tabName = "validationIr",
-                          shinydashboard::box(title = "Validation",
+                          shinydashboard::box(title = "Probabilisitic reference standard validation",
                                               width = NULL,
                                               DT::dataTableOutput(outputId = "validationResults")),
-                          shinydashboard::box(title = "IP, IR results",
+                          shinydashboard::box(title = "IP/100k persons, IR/100k person-years",
                                               width = NULL,
                                               DT::dataTableOutput(outputId = "irResults"))
   ),

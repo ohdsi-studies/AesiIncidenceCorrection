@@ -8,8 +8,8 @@ getCorrectedIrIp <- function(row,
   atRisk <- row$atRisk
   personDays <- row$personDays
   outcomes <- row$outcomes
-  ip100k_p <- row$ip100k_p
-  ir100k_py <- row$ir100k_py
+  IP <- row$IP
+  IR <- row$IR
   daysPerPerson <- personDays / atRisk
 
   if (method == "sensSpec") {
@@ -26,50 +26,50 @@ getCorrectedIrIp <- function(row,
     cOutcomes <- (outcomes - (fpRate * personDays)) / sens
   }
 
-  if (cOutcomes >= 0) {
+  if (cOutcomes > 0) {
 
     outcomesDiff <- cOutcomes - outcomes
     personDaysDiff <- outcomesDiff * daysPerPerson / 2
     cPersonDays <- personDays + personDaysDiff
 
     # IP
-    cIp100k_p <- cOutcomes / atRisk * 100000
-    ipDiff <- cIp100k_p - ip100k_p
-    ipRel <- cIp100k_p / ip100k_p
-    eameIp <- abs(log(ipRel))
+    cIP <- cOutcomes / atRisk * 100000
+    IPdiff <- cIP - IP
+    IPrel <- cIP / IP
+    IPeame <- abs(log(IPrel))
 
     # IR
     if (method == "fpRate") {
-      cIr100k_py <- cOutcomes / personDays * 100000 * 365
+      cIR <- cOutcomes / personDays * 100000 * 365
       cPersonDays <- personDays
     } else {
-      cIr100k_py <- cOutcomes / cPersonDays * 100000 * 365
+      cIR <- cOutcomes / cPersonDays * 100000 * 365
     }
-    irDiff <- cIr100k_py - ir100k_py
-    irRel <- cIr100k_py / ir100k_py
-    eameIr <- abs(log(irRel))
+    IRdiff <- cIR - IR
+    IRrel <- cIR / IR
+    IReame <- abs(log(IRrel))
 
   } else {
-    cIp100k_p <- NA
-    ipDiff <- NA
-    ipRel <- NA
-    eameIp <- NA
+    cIP <- NA
+    IPdiff <- NA
+    IPrel <- NA
+    IPeame <- NA
     cPersonDays <- NA
-    cIr100k_py <- NA
-    irDiff <- NA
-    irRel <- NA
-    eameIr <- NA
+    cIR <- NA
+    IRdiff <- NA
+    IRrel <- NA
+    IReame <- NA
   }
   row$cOutcomes <- round(cOutcomes, 0)
-  row$cIp100k_p <- round(cIp100k_p, 3)
-  row$ipDiff <- round(ipDiff, 3)
-  row$ipRel <- round(ipRel, 3)
-  row$eameIp <- round(eameIp, 3)
+  row$cIP <- round(cIP, 3)
+  row$IPdiff <- round(IPdiff, 3)
+  row$IPrel <- round(IPrel, 3)
+  row$IPeame <- round(IPeame, 3)
   row$cPersonDays <- round(cPersonDays, 0)
-  #row$cIr100py <- round(cIr100k_py, 3)
-  row$irDiff <- round(irDiff, 3)
-  row$irRel <- round(irRel, 3)
-  row$eameIr <- round(eameIr, 3)
+  row$cIR <- round(cIR, 3)
+  row$IRdiff <- round(IRdiff, 3)
+  row$IRrel <- round(IRrel, 3)
+  row$IReame <- round(IReame, 3)
 
   return(row)
 }

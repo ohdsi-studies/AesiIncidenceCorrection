@@ -12,40 +12,85 @@ summaryTable <- readr::read_csv("data/correctedIrSummary.csv", show_col_types = 
     prev = estimatedPrevalence,
     sens = sensitivity,
     spec = specificity,
-    ip100k_p = incidenceProportionP100p,
-    ir100k_py = incidenceRateP100py,
-    tp = truePositives,
-    tn = trueNegatives,
-    fp = falsePositives,
-    fn = falseNegatives,
+    IP = incidenceProportionP100p,
+    IR = incidenceRateP100py,
+    TP = truePositives,
+    TN = trueNegatives,
+    FP = falsePositives,
+    FN = falseNegatives,
     cOutcomes = correctedOutcomes,
-    cIp100k_p = correctedIp100p,
+    cIP = correctedIp100p,
     cPersonDays = correctedPersonDays,
-    cIr100k_py = correctedIr100py,
-    ipDiff = absIpDiff,
-    ipRel = relIpDiff,
-    irDiff = absIrDiff,
-    irRel = relIrDiff
+    cIR = correctedIr100py,
+    IPdiff = absIpDiff,
+    IPrel = relIpDiff,
+    IRdiff = absIrDiff,
+    IRrel = relIrDiff
   ) %>%
   dplyr::mutate(
-    ip100k_p = round(ip100k_p * 1000, 0),
-    ir100k_py = round(ir100k_py * 1000, 0),
+    IP = round(IP * 1000, 0),
+    IR = round(IR * 1000, 0),
     sens = round(sens, 5),
     spec = round(spec, 5),
     ppv = round(ppv, 5),
     npv = round(npv, 5),
     prev = prev / 100,
     cOutcomes = round(cOutcomes, 0),
-    cIp100k_p = round(cIp100k_p * 1000, 0),
-    ipDiff = round(ipDiff * 1000, 0),
-    ipRel = round(ipRel, 3),
-    eameIp = round(eameIp, 3),
+    cIP = round(cIP * 1000, 0),
+    IPdiff = round(IPdiff * 1000, 0),
+    IPrel = round(IPrel, 3),
+    IPeame = round(eameIp, 3),
     cPersonDays = round(cPersonDays, 0),
-    cIr100k_py = round(cIr100k_py * 1000, 0),
-    irDiff = round(irDiff * 1000, 0),
-    irRel = round(irRel, 3),
-    eameIr = round(eameIr, 3)
+    cIR = round(cIR * 1000, 0),
+    IRdiff = round(IRdiff * 1000, 0),
+    IRrel = round(IRrel, 3),
+    IReame = round(eameIr, 3)
+  ) %>%
+  dplyr::relocate(
+    source,
+    method,
+    stratum
   )
+
+summaryTable$sourceOrder <- match(
+  summaryTable$source,
+  c("optum_extended_dod",
+    "truven_ccae",
+    "truven_mdcd",
+    "truven_mdcr",
+    "optum_ehr")
+  )
+summaryTable$methodOrder <- match(
+  summaryTable$method,
+  c("sensSpec",
+    "ppvNpv",
+    "sensPpv",
+    "fpRate")
+  )
+
+summaryTable$stratumOrder <- match(
+  summaryTable$stratum,
+  c("ALL",
+    "Male",
+    "Female",
+    "<5",
+    "18 - 34",
+    "55 - 64",
+    "35 - 54",
+    "5 - 17",
+    "75 - 84",
+    "65 - 74",
+    ">=85")
+  )
+
+summaryTable <- summaryTable[order(summaryTable$sourceOrder,
+                                   summaryTable$methodOrder,
+                                   summaryTable$stratumOrder,
+                                   summaryTable$oName), ]
+summaryTable$methodOrder <- NULL
+summaryTable$stratumOrder <- NULL
+summaryTable$sourceOrder <- NULL
+
 
 summaryTable$tName[summaryTable$tName == "[IrCorrection] Persons observed on 1 Jan 2017-2019"] <- "1 Jan 2017-2019"
 summaryTable$oName <- sub("\\[IrCorrection\\]", "", summaryTable$oName)
@@ -56,21 +101,22 @@ irTable <- summaryTable %>%
   dplyr::select(
     method,
     source,
+    stratum,
     tName,
     oName,
     atRisk,
     personDays,
     outcomes,
-    ip100k_p,
-    cIp100k_p,
-    ipDiff,
-    ipRel,
-    eameIp,
-    ir100k_py,
-    cIr100k_py,
-    irDiff,
-    irRel,
-    eameIr,
+    IP,
+    cIP,
+    IPdiff,
+    IPrel,
+    IPeame,
+    IR,
+    cIR,
+    IRdiff,
+    IRrel,
+    IReame,
     cOutcomes,
     cPersonDays
   )
@@ -78,12 +124,12 @@ irTable <- summaryTable %>%
 validationTable <- summaryTable %>%
   dplyr::select(
     source,
+    stratum,
     oName,
-    tp,
-    tn,
-    fp,
-    fn,
-    prev,
+    TP,
+    TN,
+    FP,
+    FN,
     sens,
     spec,
     ppv,
@@ -101,7 +147,8 @@ dbMaIrSummary$sourceName <- sub("_v.*", "", dbMaIrSummary$sourceName)
 maMetrics <- dbMaIrSummary %>%
   dplyr::select(
     method,
-    sourceName,
+    source = sourceName,
+    stratum,
     targetName,
     outcomeName,
     ir,
@@ -118,16 +165,57 @@ maMetrics <- dbMaIrSummary %>%
     k
   )
 
+maMetrics$sourceOrder <- match(
+  maMetrics$source,
+  c("optum_extended_dod",
+    "truven_ccae",
+    "truven_mdcd",
+    "truven_mdcr",
+    "optum_ehr")
+)
+maMetrics$methodOrder <- match(
+  maMetrics$method,
+  c("uncorrected",
+    "sensSpec",
+    "ppvNpv",
+    "sensPpv",
+    "fpRate")
+)
+
+maMetrics$stratumOrder <- match(
+  maMetrics$stratum,
+  c("ALL",
+    "Male",
+    "Female",
+    "<5",
+    "5 - 17",
+    "18 - 34",
+    "35 - 54",
+    "55 - 64",
+    "65 - 74",
+    "75 - 84",
+    ">=85")
+)
+
+maMetrics <- maMetrics[order(maMetrics$sourceOrder,
+                             maMetrics$methodOrder,
+                             maMetrics$stratumOrder,
+                             maMetrics$outcomeName), ]
+maMetrics$methodOrder <- NULL
+maMetrics$stratumOrder <- NULL
+maMetrics$sourceOrder <- NULL
+
 # user inputs
 methods <- unique(maMetrics$method)
-databases <- unique(c(irTable$source, maMetrics$sourceName))
+databases <- unique(c(irTable$source, maMetrics$source))
+strata <- unique(maMetrics$stratum)
 targets <- unique(summaryTable$tName)
 outcomes <- unique(summaryTable$oName)
 intervals <- c("ci", "prediction")
 
 # set inputs
-inputSens <- validationTable$sens[validationTable$source == databases[1] & validationTable$oName == outcomes[1]]
-inputSpec <- validationTable$spec[validationTable$source == databases[1] & validationTable$oName == outcomes[1]]
-inputPpv <- validationTable$ppv[validationTable$source == databases[1] & validationTable$oName == outcomes[1]]
-inputNpv <- validationTable$npv[validationTable$source == databases[1] & validationTable$oName == outcomes[1]]
+inputSens <- validationTable$sens[validationTable$source == databases[1] & validationTable$oName == outcomes[1] & validationTable$stratum == strata[1]]
+inputSpec <- validationTable$spec[validationTable$source == databases[1] & validationTable$oName == outcomes[1] & validationTable$stratum == strata[1]]
+inputPpv <- validationTable$ppv[validationTable$source == databases[1] & validationTable$oName == outcomes[1] & validationTable$stratum == strata[1]]
+inputNpv <- validationTable$npv[validationTable$source == databases[1] & validationTable$oName == outcomes[1] & validationTable$stratum == strata[1]]
 

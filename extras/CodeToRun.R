@@ -37,6 +37,18 @@ databaseNames <- c(
 
 cdmSources <- ROhdsiWebApi::getCdmSources(baseUrl)
 cdmSources <- cdmSources[cdmSources$sourceName != "Default Vocabulary", ]
+
+ehrRow <- tibble::tibble( # "cdm_optum_ehr_v2447" NO LONGER AVAILABLE VIA WEBAPI, IVESTIGATE
+  sourceId = 999,
+  sourceName = "Optum EHR (v2447)",
+  sourceKey = "cdm_optum_ehr_v2447",
+  sourceDialect = "redshift",
+  cdmDatabaseSchema = "cdm_optum_ehr_v2447",
+  vocabDatabaseSchema = "cdm_optum_ehr_v2447",
+  resultsDatabaseSchema = "results_optum_ehr_v2247"
+)
+cdmSources <- dplyr::bind_rows(cdmSources, ehrRow)
+
 cdmSources$databaseName <- substr(cdmSources$sourceKey, 5, nchar(cdmSources$sourceKey)-6)
 cdmSources$version <- substr(cdmSources$sourceKey, nchar(cdmSources$sourceKey)-3, nchar(cdmSources$sourceKey))
 cdmSources <- cdmSources[!is.na(cdmSources$cdmDatabaseSchema), ]
@@ -45,10 +57,10 @@ cdmSources <- cdmSources %>% dplyr::filter(.data$cdmDatabaseSchema %in% database
 cdmSources$order <- match(cdmSources$sourceKey, databaseNames)
 cdmSources <- cdmSources[order(cdmSources$order), ]
 cdmSources$order <- NULL
-databaseIds <- cdmSources$databaseName
+databaseIds <- c(cdmSources$databaseName)
 
 
-for (i in 1:nrow(cdmSources)) { # i = 4
+for (i in 1:nrow(cdmSources)) { # i=1
 
   ROhdsiWebApi::authorizeWebApi(baseUrl, "windows")
 
@@ -80,27 +92,11 @@ for (i in 1:nrow(cdmSources)) { # i = 4
     createCohortTable = FALSE,
     createCohorts = FALSE,
     runOutcomeValidation = FALSE,
-    runSubgroupOutcomeValidation = TRUE,
+    runStratificedOutcomeValidation = FALSE,
     runIncidenceAnalysis = FALSE,
-    runIncidenceCorrection = FALSE,
-    evaluateIrCorrection = FALSE
+    runIncidenceCorrection = FALSE,  # incidenceCorrection must happen outside of DB loop FIX
+    evaluateIrCorrection = FALSE     # evaluateIrCorrection must happen outside of DB loop FIX
   )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

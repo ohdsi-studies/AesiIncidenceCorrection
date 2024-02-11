@@ -2,10 +2,12 @@ plotIrForest2 <- function(dbMaIrSummary,
                           targetName,
                           outcomeName,
                           method,
+                          stratum,
                           interval) {
 
   plotData <- dbMaIrSummary[dbMaIrSummary$outcomeName %in% outcomeName &
                              dbMaIrSummary$targetName %in% targetName &
+                             dbMaIrSummary$stratum %in% stratum &
                              dbMaIrSummary$method %in% method, ]
 
   plotData <- plotData %>%

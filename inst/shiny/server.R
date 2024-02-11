@@ -5,6 +5,7 @@ shiny::shinyServer(function(input, output) {
     data <- validationTable %>%
       dplyr::filter(
         .data$source %in% input$database1 &
+          .data$stratum %in% input$strata1 &
           .data$oName %in% input$outcome1
       )
     return(data)
@@ -28,6 +29,7 @@ shiny::shinyServer(function(input, output) {
       dplyr::filter(
         .data$method %in% input$method1 &
         .data$source %in% input$database1 &
+        .data$stratum %in% input$strata1 &
         .data$tName %in% input$target1 &
         .data$oName %in% input$outcome1
       ) %>%
@@ -61,6 +63,7 @@ shiny::shinyServer(function(input, output) {
                           targetName = input$target2,
                           outcomeName = input$outcome2,
                           method = input$method2,
+                          stratum = input$strata2,
                           interval = input$interval)
     return(plot)
   })
@@ -74,7 +77,8 @@ shiny::shinyServer(function(input, output) {
     data <- maMetrics %>%
       dplyr::filter(targetName %in% input$target2 &
                       outcomeName %in% input$outcome2 &
-                      method %in% input$method2) %>%
+                      method %in% input$method2 &
+                      stratum %in% input$strata2) %>%
       dplyr::mutate_if(is.numeric, round, digits = 3)
     return(data)
   })
@@ -91,11 +95,12 @@ shiny::shinyServer(function(input, output) {
     return(table)
   })
 
-
+  # MAYBE SWITCH TO dbMaIrSummary since it has CIs -> good for plot
   getIpIrCorrectionsReactive <- shiny::reactive(x = {
     row <- irTable %>%
       dplyr::filter(.data$method == input$method3 &
                       .data$source == input$database3 &
+                      .data$stratum == input$strata3 &
                       .data$tName == input$target3 &
                       .data$oName == input$outcome3)
     row <- getCorrectedIrIp(row = row,
@@ -104,7 +109,7 @@ shiny::shinyServer(function(input, output) {
                             spec = input$spec,
                             ppv = input$ppv,
                             npv = input$npv) %>%
-      dplyr::select(-c(method, source, tName, oName))
+      dplyr::select(-c(method, source, stratum, tName, oName))
     return(row)
   })
 

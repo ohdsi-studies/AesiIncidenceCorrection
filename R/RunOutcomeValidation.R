@@ -111,10 +111,6 @@ runOutcomeValidation <- function(baseUrl,
   readr::write_csv(results, file.path(pvFolder, "pvResults.csv"))
 }
 
-# evalCohort <- readRDS("G:/aesiIncidenceCorrection/truven_ccae/pheValuator/EvaluationCohort_e5/evaluationCohort_main.rds")
-# evalCohortPrediction <- evalCohort$prediction
-# model <- readRDS("G:/aesiIncidenceCorrection/truven_ccae/pheValuator/EvaluationCohort_e5/model_main.rds")
-# betas <- model$model$covariateImportance
 
 
 # if want to evaluate xSpec and Prev cohorts

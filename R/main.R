@@ -4,6 +4,7 @@ execute <- function(connectionDetails,
                     outputFolder,
                     cohortRef,
                     databaseId,
+                    databaseIds,
                     cohortIds = NULL,
                     targetCohortIds = NULL,
                     outcomeCohortIds = NULL,
@@ -15,7 +16,7 @@ execute <- function(connectionDetails,
                     createCohorts = FALSE,
                     createValidationCohorts = FALSE,
                     runOutcomeValidation = FALSE,
-                    runSubgroupOutcomeValidation = FALSE,
+                    runStratificedOutcomeValidation = FALSE,
                     runIncidenceAnalysis = FALSE,
                     runIncidenceCorrection = FALSE,
                     evaluateIrCorrection = FALSE,
@@ -62,8 +63,8 @@ execute <- function(connectionDetails,
     )
   }
 
-  if (runSubgroupOutcomeValidation) {
-    AesiIncidenceCorrection::runSubgroupOutcomeValidation(
+  if (runStratificedOutcomeValidation) {
+    AesiIncidenceCorrection::runStratificedOutcomeValidation(
       baseUrl = baseUrl,
       connectionDetails = connectionDetails,
       cdmDatabaseSchema = cdmDatabaseSchema,
@@ -91,7 +92,7 @@ execute <- function(connectionDetails,
   if (runIncidenceCorrection) {
     AesiIncidenceCorrection::runIncidenceCorrection(
       outputFolder = outputFolder,
-      cohortRef = cohortRef
+      databaseIds = databaseIds
     )
   }
 

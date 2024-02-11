@@ -1,8 +1,9 @@
 #' @export
-runIncidenceCorrection <- function(outputFolder,     # outputFolder <- "G:/aesiIncidenceCorrection"
-                                   cohortRef) {
+runIncidenceCorrection <- function(outputFolder,
+                                   databaseIds) {
 
-  databaseIds <- cdmSources$databaseName
+  # outputFolder <- "G:/aesiIncidenceCorrection"
+  # databaseIds <- c("optum_extended_dod", "truven_ccae", "truven_mdcd", "truven_mdcr", "optum_ehr")
 
   irSummary <- tibble::tibble()
   valSummary <- tibble::tibble()
@@ -10,28 +11,61 @@ runIncidenceCorrection <- function(outputFolder,     # outputFolder <- "G:/aesiI
   for (databaseId in databaseIds) { # databaseId <- databaseIds[1]
 
     irSummaryDbFile <- file.path(outputFolder, databaseId, "incidence", "irSummary.csv")
-    irSummaryDb <- readr::read_csv(irSummaryDbFile, show_col_types = FALSE) %>%
-      dplyr::filter(is.na(startYear) & is.na(genderId) & is.na(ageId)) %>%
-      dplyr::select(
-        sourceName,
-        targetCohortDefinitionId,
-        targetName,
-        outcomeCohortDefinitionId,
-        outcomeName,
-        personsAtRisk,
-        personDays,
-        outcomes,
-        incidenceProportionP100p,
-        incidenceRateP100py
-      )
+
+    irSummaryNoStrata <- readr::read_csv(irSummaryDbFile, show_col_types = FALSE) %>%
+      dplyr::filter(is.na(startYear) & is.na(genderId) & is.na(ageId))
+
+    irSummaryAgeStrata <- readr::read_csv(irSummaryDbFile, show_col_types = FALSE) %>%
+      dplyr::filter(is.na(startYear) & is.na(genderId) & !is.na(ageId))
+
+    irSummarySexStrata <- readr::read_csv(irSummaryDbFile, show_col_types = FALSE) %>%
+      dplyr::filter(is.na(startYear) & !is.na(genderId) & is.na(ageId))
+
+    # do later, needs validation fixing
+    # irSummaryAgeSexStrata <- readr::read_csv(irSummaryDbFile, show_col_types = FALSE) %>%
+    #   dplyr::filter(is.na(startYear) & !is.na(genderId) & !is.na(ageId))
+
+    irSummaryDb <- dplyr::bind_rows(
+      irSummaryNoStrata,
+      irSummaryAgeStrata,
+      irSummarySexStrata
+    ) %>%
+    dplyr::mutate(
+      stratum = ifelse(is.na(genderName) & is.na(ageGroupName), "ALL", NA),
+      stratum = ifelse(is.na(stratum) & is.na(genderName) & !is.na(ageGroupName), ageGroupName, stratum),
+      stratum = ifelse(is.na(stratum) & !is.na(genderName) & is.na(ageGroupName), genderName, stratum)
+    ) %>%
+    dplyr::select(
+      sourceName,
+      targetCohortDefinitionId,
+      targetName,
+      outcomeCohortDefinitionId,
+      outcomeName,
+      stratum,
+      personsAtRisk,
+      personDays,
+      outcomes,
+      incidenceProportionP100p,
+      incidenceRateP100py
+    )
+    irSummaryDb$stratum[irSummaryDb$stratum == "MALE"] <- "Male"
+    irSummaryDb$stratum[irSummaryDb$stratum == "FEMALE"] <- "Female"
+
     irSummary <- dplyr::bind_rows(irSummary, irSummaryDb)
 
 
     valSummaryDbFile <- file.path(outputFolder, databaseId, "pheValuator", "pvResults.csv")
     valSummaryDb <- readr::read_csv(valSummaryDbFile, show_col_types = FALSE) %>%
+      dplyr::filter(cutPoint != "Error: Too few outcomes to produce model") %>%
+      dplyr::mutate(
+        cdm = gsub("\\_v....", "", cdm),
+        cdm = gsub("cdm_", "", cdm),
+        stratum = "ALL"
+      ) %>%
       dplyr::select(
         cohortId,
         cdm,
+        stratum,
         truePositives,
         trueNegatives,
         falsePositives,
@@ -41,51 +75,94 @@ runIncidenceCorrection <- function(outputFolder,     # outputFolder <- "G:/aesiI
         specificity,
         ppv,
         npv
-      ) %>%
+      )
+
+    valStratSummaryDbFile <- file.path(outputFolder, databaseId, "pheValuator", "stratifiedPvResults.csv")
+    valStratSummaryDb <- readr::read_csv(valStratSummaryDbFile, show_col_types = FALSE) %>%
+      dplyr::filter(!is.na(stratum)) %>%
       dplyr::mutate(
         cdm = gsub("\\_v....", "", cdm),
         cdm = gsub("cdm_", "", cdm)
+      ) %>%
+      dplyr::select(
+        cohortId,
+        cdm,
+        stratum,
+        truePositives,
+        trueNegatives,
+        falsePositives,
+        falseNegatives,
+        estimatedPrevalence,
+        sensitivity,
+        specificity,
+        ppv,
+        npv
       )
-    valSummary <- dplyr::bind_rows(valSummary, valSummaryDb)
+
+    valSummary <- dplyr::bind_rows(
+      valSummary,
+      valSummaryDb,
+      valStratSummaryDb
+    )
   }
 
-  irSummary <- dplyr::inner_join(
+  rm(irSummaryNoStrata,
+     irSummaryAgeStrata,
+     irSummarySexStrata,
+     irSummaryDb,
+     valSummaryDb,
+     valStratSummaryDb)
+
+
+  irSummaryVal <- dplyr::inner_join(
     x = irSummary,
     y = valSummary,
     by = c("sourceName" = "cdm",
-           "outcomeCohortDefinitionId" = "cohortId")
+           "outcomeCohortDefinitionId" = "cohortId",
+           "stratum" = "stratum")
   )
 
-  irSummaryList <- split(irSummary, 1:nrow(irSummary))
-  irSummaryList <- lapply(irSummaryList, correctIpIr, method = "sensSpec")
-  irSummarySensSpec <- dplyr::bind_rows(irSummaryList)
+  # keep IRs without corresponding phenotype errors
+  # irSummaryLeftTest <- dplyr::left_join(
+  #   x = irSummary,
+  #   y = valSummary,
+  #   by = c("sourceName" = "cdm",
+  #          "outcomeCohortDefinitionId" = "cohortId",
+  #          "stratum" = "stratum")
+  # )
 
-  irSummaryList <- split(irSummary, 1:nrow(irSummary))
-  irSummaryList <- lapply(irSummaryList, correctIpIr, method = "ppvNpv")
-  irSummaryPpvNpv <- dplyr::bind_rows(irSummaryList)
 
-  irSummaryList <- split(irSummary, 1:nrow(irSummary))
-  irSummaryList <- lapply(irSummaryList, correctIpIr, method = "sensPpv")
-  irSummarySensPpv <- dplyr::bind_rows(irSummaryList)
+  irSummaryValList <- split(irSummaryVal, 1:nrow(irSummaryVal))
+  irSummaryValList <- lapply(irSummaryValList, correctIpIr, method = "sensSpec")
+  irSummarySensSpec <- dplyr::bind_rows(irSummaryValList)
 
-  irSummaryList <- split(irSummary, 1:nrow(irSummary))
-  irSummaryList <- lapply(irSummaryList, correctIpIr, method = "fpRate")
-  irSummaryFpRate <- dplyr::bind_rows(irSummaryList)
+  irSummaryValList <- split(irSummaryVal, 1:nrow(irSummaryVal))
+  irSummaryValList <- lapply(irSummaryValList, correctIpIr, method = "ppvNpv")
+  irSummaryPpvNpv <- dplyr::bind_rows(irSummaryValList)
 
-  irSummary <-  dplyr::bind_rows(irSummarySensSpec,
-                                 irSummaryPpvNpv,
-                                 irSummarySensPpv,
-                                 irSummaryFpRate)
+  irSummaryValList <- split(irSummaryVal, 1:nrow(irSummaryVal))
+  irSummaryValList <- lapply(irSummaryValList, correctIpIr, method = "sensPpv")
+  irSummarySensPpv <- dplyr::bind_rows(irSummaryValList)
+
+  irSummaryValList <- split(irSummaryVal, 1:nrow(irSummaryVal))
+  irSummaryValList <- lapply(irSummaryValList, correctIpIr, method = "fpRate")
+  irSummaryFpRate <- dplyr::bind_rows(irSummaryValList)
+
+  irSummaryFinal <-  dplyr::bind_rows(irSummarySensSpec,
+                                      irSummaryPpvNpv,
+                                      irSummarySensPpv,
+                                      irSummaryFpRate)
 
   readr::write_csv(
-    x = irSummary,
+    x = irSummaryFinal,
     file = file.path(outputFolder, "correctedIrSummary.csv")
   )
 }
 
-
-correctIpIr <- function(row,       # row <- irSummary[1, ]
+correctIpIr <- function(row,       # row <- irSummaryVal[, ]
                         method) {  # "sensSpec" or "ppvNpv" or "sensPpv" or "fpRate"
+
+  #print(c(row$sourceName, row$outcomeName, row$stratum))
 
   personsAtRisk <- row$personsAtRisk
   personDays <- row$personDays
@@ -113,6 +190,36 @@ correctIpIr <- function(row,       # row <- irSummary[1, ]
   if (method == "fpRate") {
     fpRate <- outcomes * (1 - spec) / personDays
     correctedOutcomes <- (outcomes - (fpRate * personDays)) / sens
+  }
+
+  #print(correctedOutcomes)
+
+  if (is.nan(correctedOutcomes)) {
+    warning(sprintf("correctedOutcomes is NaN in %s, %s, %s, %s", method, row$sourceName, row$targetName, row$outcomeName))
+    correctedIp100p <- NA
+    absIpDiff <- NA
+    relIpDiff <- NA
+    eameIp <- NA
+    correctedPersonDays <- NA
+    correctedIr100py <- NA
+    absIrDiff <- NA
+    relIrDiff <- NA
+    eameIr <- NA
+
+    row$correctedOutcomes <- correctedOutcomes
+    row$correctedIp100p <- correctedIp100p
+    row$absIpDiff <- absIpDiff
+    row$relIpDiff <- relIpDiff
+    row$eameIp <- eameIp
+    row$correctedPersonDays <- correctedPersonDays
+    row$correctedIr100py <- correctedIr100py
+    row$absIrDiff <- absIrDiff
+    row$relIrDiff <- relIrDiff
+    row$eameIr <- eameIr
+    row$method <- method
+
+    row <- dplyr::relocate(row, method)
+    return(row)
   }
 
   if (correctedOutcomes >= 0) {
